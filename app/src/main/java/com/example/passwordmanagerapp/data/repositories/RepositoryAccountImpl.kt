@@ -1,4 +1,4 @@
-package com.example.passwordmanagerapp.data
+package com.example.passwordmanagerapp.data.repositories
 
 import javax.inject.Inject
 

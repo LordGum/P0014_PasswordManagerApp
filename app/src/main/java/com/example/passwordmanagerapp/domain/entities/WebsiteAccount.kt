@@ -2,7 +2,7 @@ package com.example.passwordmanagerapp.domain.entities
 
 //TODO доработать password
 data class WebsiteAccount (
-    val login: String,
-    val password: String,
+    val cipherLogin: String,
+    val cipherPassword: String,
     var comment: String
 )
