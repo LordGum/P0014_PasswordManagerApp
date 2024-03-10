@@ -5,5 +5,5 @@ interface RepositoryMain {
 
     suspend fun checkFingerPrint(): Boolean
 
-    suspend fun resetMasterPassword(): Boolean
+    suspend fun resetMasterPassword(masterPassword: String)
 }
