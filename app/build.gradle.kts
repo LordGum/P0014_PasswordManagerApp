@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")
+    id ("kotlin-parcelize")
 }
 
 android {
@@ -69,7 +70,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     //for observeAsState
-    implementation("androidx.compose.runtime:runtime-livedata:1.6.2")
+    implementation("androidx.compose.runtime:runtime-livedata:1.6.3")
 
     //navigation
     implementation("androidx.navigation:navigation-compose:2.7.7")
@@ -93,4 +94,14 @@ dependencies {
     implementation("androidx.room:room-ktx:$roomVersion")
     implementation("androidx.room:room-runtime:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")
+
+    //flow
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
+
+    //biometric
+    implementation("androidx.biometric:biometric:1.1.0")
+
+    //json
+    //implementation("com.google.code.gson:gson:2.10")
+
 }

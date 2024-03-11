@@ -13,4 +13,6 @@ interface RepositoryWebsite {
 
     suspend fun deleteWebsite(idWebsite: Int)
 
+    suspend fun getWebsiteInfo(idWebsite: Int): Website
+
 }
