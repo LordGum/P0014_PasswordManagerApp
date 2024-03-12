@@ -1,10 +1,12 @@
-package com.example.passwordmanagerapp.presentation
+package com.example.passwordmanagerapp.presentation.main
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -12,20 +14,31 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.passwordmanagerapp.domain.entities.Website
 
 @Composable
@@ -36,7 +49,7 @@ fun MainScreen(viewModel: MainViewModel) {
     when (val currentState = screenState.value) {
         is MainScreenState.WebsiteList -> {
             MainScreenContent(
-//                viewModel =viewModel,
+                viewModel =viewModel,
                 list = currentState.websiteList
             )
         }
@@ -45,22 +58,48 @@ fun MainScreen(viewModel: MainViewModel) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreenContent(
-//    viewModel: MainViewModel,
+    viewModel: MainViewModel,
     list: List<Website>
 ) {
-    LazyColumn(
-        contentPadding = PaddingValues(
-            top = 16.dp,
-            bottom = 72.dp,
-            start = 8.dp,
-            end = 8.dp
-        ),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(items = list, key = { it.id }) { item ->
-            WebsiteCard(item)
+    val listState = rememberLazyListState()
+    val expandedFab = remember {
+        derivedStateOf {
+            listState.firstVisibleItemIndex == 0
+        }
+    }
+
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.onSecondary,
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                onClick = {
+                          TODO()
+                },
+                expanded = expandedFab.value,
+                icon = { Icon(Icons.Filled.Add, null) },
+                text = { Text(text = "Add password") },
+            )
+        },
+        floatingActionButtonPosition = FabPosition.End,
+    ) {paddingValues ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentPadding = PaddingValues(
+                top = 16.dp,
+                start = 8.dp,
+                end = 8.dp,
+                bottom = 0.dp
+            ),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(items = list, key = { it.id }) { item ->
+                WebsiteCard(item)
+            }
         }
     }
 }
@@ -71,10 +110,13 @@ fun WebsiteCard(website: Website) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(40.dp),
-        shape = RoundedCornerShape(8.dp),
+            .height(72.dp)
+            .clickable {
+                       TODO()
+            },
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primary,
+            containerColor = MaterialTheme.colorScheme.onPrimary,
             contentColor = MaterialTheme.colorScheme.onSecondary
         )
     ) {
@@ -83,14 +125,14 @@ fun WebsiteCard(website: Website) {
         ){
             Image(
                 modifier = Modifier
-                    .size(40.dp)
-                    .padding(5.dp)
+                    .padding(10.dp)
+                    .size(50.dp)
                     .clip(CircleShape),
                 painter = ColorPainter(Color.Magenta),
                 contentDescription = null
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(text = website.name)
+            Text(fontSize = 20.sp, text = website.name)
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.example.passwordmanagerapp.presentation
+package com.example.passwordmanagerapp.presentation.main
 
 import com.example.passwordmanagerapp.domain.entities.Website
 

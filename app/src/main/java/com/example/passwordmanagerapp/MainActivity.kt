@@ -4,8 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.ViewModelProvider
-import com.example.passwordmanagerapp.presentation.MainScreen
-import com.example.passwordmanagerapp.presentation.MainViewModel
+import com.example.passwordmanagerapp.presentation.main.MainScreen
+import com.example.passwordmanagerapp.presentation.main.MainViewModel
 import com.example.passwordmanagerapp.ui.theme.PasswordManagerAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -13,7 +13,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             PasswordManagerAppTheme {
-
 
                 val viewModel: MainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
                 MainScreen(viewModel)

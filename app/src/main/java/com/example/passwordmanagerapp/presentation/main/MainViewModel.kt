@@ -1,12 +1,10 @@
-package com.example.passwordmanagerapp.presentation
+package com.example.passwordmanagerapp.presentation.main
 
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.passwordmanagerapp.data.repositories.RepositoryWebsiteImpl
-import com.example.passwordmanagerapp.domain.entities.Website
-import com.example.passwordmanagerapp.domain.usecases.website.AddWebsiteUseCase
 import com.example.passwordmanagerapp.domain.usecases.website.DeleteWebsiteUseCase
 import com.example.passwordmanagerapp.domain.usecases.website.GetWebsitesListUseCase
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -21,7 +19,6 @@ class MainViewModel @Inject constructor(
 
     private val repository = RepositoryWebsiteImpl(application)
 
-    private val addWebsiteUseCase =  AddWebsiteUseCase(repository)
     private val deleteWebsiteUseCase =  DeleteWebsiteUseCase(repository)
     private val getWebsiteListUseCase =  GetWebsitesListUseCase(repository)
 
@@ -33,11 +30,6 @@ class MainViewModel @Inject constructor(
         .filter { it.isNotEmpty() }
         .map { MainScreenState.WebsiteList(websiteList = it) as MainScreenState }
 
-    fun addWebsite(website: Website) {
-        viewModelScope.launch(exceptionHandler) {
-            addWebsiteUseCase(website)
-        }
-    }
 
     fun deleteWebsite(idWebsite: Int) {
         viewModelScope.launch(exceptionHandler) {
