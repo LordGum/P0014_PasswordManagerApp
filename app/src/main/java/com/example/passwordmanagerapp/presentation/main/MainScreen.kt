@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.sp
 import com.example.passwordmanagerapp.domain.entities.Website
 
 @Composable
-fun MainScreen(viewModel: MainViewModel) {
+fun MainScreen(viewModel: MainViewModel, onWebsiteClickListener: () -> Unit) {
 
     val screenState = viewModel.screenState.collectAsState(MainScreenState.Initial)
 
@@ -50,7 +50,8 @@ fun MainScreen(viewModel: MainViewModel) {
         is MainScreenState.WebsiteList -> {
             MainScreenContent(
                 viewModel =viewModel,
-                list = currentState.websiteList
+                list = currentState.websiteList,
+                onWebsiteClickListener = onWebsiteClickListener
             )
         }
         MainScreenState.Initial -> {}
@@ -62,7 +63,8 @@ fun MainScreen(viewModel: MainViewModel) {
 @Composable
 fun MainScreenContent(
     viewModel: MainViewModel,
-    list: List<Website>
+    list: List<Website>,
+    onWebsiteClickListener: () -> Unit
 ) {
     val listState = rememberLazyListState()
     val expandedFab = remember {
@@ -76,7 +78,7 @@ fun MainScreenContent(
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = {
-                          TODO()
+                    onWebsiteClickListener()
                 },
                 expanded = expandedFab.value,
                 icon = { Icon(Icons.Filled.Add, null) },
@@ -98,7 +100,7 @@ fun MainScreenContent(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(items = list, key = { it.id }) { item ->
-                WebsiteCard(item)
+                WebsiteCard(item, onWebsiteClickListener)
             }
         }
     }
@@ -106,13 +108,16 @@ fun MainScreenContent(
 
 
 @Composable
-fun WebsiteCard(website: Website) {
+fun WebsiteCard(
+    website: Website,
+    onWebsiteClickListener: () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(72.dp)
             .clickable {
-                       TODO()
+                onWebsiteClickListener()
             },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
