@@ -1,51 +1,22 @@
 package com.example.passwordmanagerapp
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.example.passwordmanagerapp.data.repositories.RepositoryAccountImpl
-import com.example.passwordmanagerapp.data.repositories.RepositoryWebsiteImpl
-import com.example.passwordmanagerapp.domain.entities.Website
-import com.example.passwordmanagerapp.domain.entities.WebsiteAccount
+import androidx.lifecycle.ViewModelProvider
+import com.example.passwordmanagerapp.presentation.MainScreen
+import com.example.passwordmanagerapp.presentation.MainViewModel
 import com.example.passwordmanagerapp.ui.theme.PasswordManagerAppTheme
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-
 
 class MainActivity : ComponentActivity() {
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
-
-        val repositoryWebsite = RepositoryWebsiteImpl(this@MainActivity)
-        val repositoryAccount = RepositoryAccountImpl()
-
         super.onCreate(savedInstanceState)
         setContent {
-            val scope = CoroutineScope(Dispatchers.IO)
-            val websiteAccount = WebsiteAccount("secret login", "secret password", "text")
-            val website = Website(
-                address = "https://favicon.yandex.net/favicon/yandex.com",
-                name = "my website",
-                accountList = arrayListOf()
-            )
-            repositoryAccount.addAccount(website, websiteAccount)
-
-            scope.launch {
-                //repositoryWebsite.addWebsite(website)
-
-                val list = repositoryWebsite.websitesList
-                list.collect{
-                    Log.d("MATAG", it[0].accountList[0].cipherLogin)
-                }
-            }
-
             PasswordManagerAppTheme {
 
 
-
+                val viewModel: MainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+                MainScreen(viewModel)
 
 
             }

@@ -101,7 +101,5 @@ dependencies {
     //biometric
     implementation("androidx.biometric:biometric:1.1.0")
 
-    //json
-    //implementation("com.google.code.gson:gson:2.10")
 
 }
