@@ -11,5 +11,5 @@ data class WebsiteDbModel(
     val iconUrl: String,
     val address: String,
     var name: String,
-    val account: List<WebsiteAccount>
+    val accountList: ArrayList<WebsiteAccount>
 )

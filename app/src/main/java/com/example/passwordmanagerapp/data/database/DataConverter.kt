@@ -8,16 +8,16 @@ import com.google.gson.reflect.TypeToken
 
 class DataConverter {
     @TypeConverter
-    fun mapListToString(value: List<WebsiteAccount>): String {
+    fun mapListToString(value: ArrayList<WebsiteAccount>): String {
         val gson = Gson()
-        val type = object : TypeToken<List<WebsiteAccount>>() {}.type
+        val type = object : TypeToken<ArrayList<WebsiteAccount>>() {}.type
         return gson.toJson(value, type)
     }
 
     @TypeConverter
-    fun mapStringToList(value: String): List<WebsiteAccount> {
+    fun mapStringToList(value: String): ArrayList<WebsiteAccount> {
         val gson = Gson()
-        val type = object : TypeToken<List<WebsiteAccount>>() {}.type
+        val type = object : TypeToken<ArrayList<WebsiteAccount>>() {}.type
         return gson.fromJson(value, type)
     }
 }

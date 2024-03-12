@@ -11,7 +11,7 @@ class Mapper @Inject constructor() {
             iconUrl = website.iconFileName,
             address = website.address,
             name = website.name,
-            account = website.account
+            accountList = website.accountList
         )
     }
 
@@ -21,7 +21,7 @@ class Mapper @Inject constructor() {
             iconFileName = websiteDbModel.iconUrl,
             address = websiteDbModel.address,
             name = websiteDbModel.name,
-            account = websiteDbModel.account
+            accountList = websiteDbModel.accountList
         )
     }
 }

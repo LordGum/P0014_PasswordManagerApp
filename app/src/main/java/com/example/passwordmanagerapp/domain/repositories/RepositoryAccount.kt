@@ -1,13 +1,13 @@
 package com.example.passwordmanagerapp.domain.repositories
 
+import com.example.passwordmanagerapp.domain.entities.Website
 import com.example.passwordmanagerapp.domain.entities.WebsiteAccount
-import kotlinx.coroutines.flow.Flow
 
 interface RepositoryAccount {
 
-    val listOfAccounts: Flow<List<WebsiteAccount>>
+     fun getListAccounts(website: Website): List<WebsiteAccount>
 
-    suspend fun addAccount(account: WebsiteAccount)
+     fun addAccount(website: Website, account: WebsiteAccount)
 
-    suspend fun refactorAccount(account: WebsiteAccount)
+     fun refactorAccount(website: Website, account: WebsiteAccount, ind: Int)
 }
