@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">PasswordManagerApp</string>
+    <string name="list_is_empty">Список пуст</string>
+    <string name="add_password">добавить пароль</string>
 </resources>

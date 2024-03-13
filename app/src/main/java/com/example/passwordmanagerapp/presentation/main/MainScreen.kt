@@ -1,8 +1,8 @@
 package com.example.passwordmanagerapp.presentation.main
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -37,8 +37,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.passwordmanagerapp.R
 import com.example.passwordmanagerapp.domain.entities.Website
 
 @Composable
@@ -109,18 +112,19 @@ fun MainScreenContent(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WebsiteCard(
     website: Website,
     onWebsiteClickListener: (Int) -> Unit
 ) {
     Card(
+        onClick = {
+            onWebsiteClickListener(website.id)
+        },
         modifier = Modifier
             .fillMaxWidth()
-            .height(72.dp)
-            .clickable {
-                onWebsiteClickListener(website.id)
-            },
+            .height(72.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.onPrimary,
@@ -166,16 +170,20 @@ fun InitialScreen(
                 },
                 expanded = expandedFab.value,
                 icon = { Icon(Icons.Filled.Add, null) },
-                text = { Text(text = "Add password") },
+                text = { Text(text = stringResource(R.string.add_password)) },
             )
         },
         floatingActionButtonPosition = FabPosition.End,
     ) { paddingValues ->
-        Text(
-            modifier = Modifier
-                .padding(paddingValues),
-            text = "no data"
-        )
+
+        Box(
+            modifier = Modifier.fillMaxSize().padding(paddingValues),
+            contentAlignment = Alignment.Center) {
+            Text(
+                text = stringResource(R.string.list_is_empty),
+                textAlign = TextAlign.Center)
+        }
+
     }
 }
 
