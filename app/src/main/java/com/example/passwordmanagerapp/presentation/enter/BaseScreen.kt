@@ -36,7 +36,13 @@ fun BaseScreen() {
         },
         detailScreenContent = {
             val viewModel: DetailViewModel = ViewModelProvider(LocalContext.current as ComponentActivity)[DetailViewModel::class.java]
-            DetailScreen(viewModel, it)
+            DetailScreen(
+                viewModel,
+                it,
+                onBackIconClick = {
+                    navigationState.navHostController.popBackStack()
+                }
+            )
         }
     )
 }

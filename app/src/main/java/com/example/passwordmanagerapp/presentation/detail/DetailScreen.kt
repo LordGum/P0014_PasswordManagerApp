@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.materialIcon
@@ -42,6 +44,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -59,13 +62,14 @@ import kotlinx.coroutines.launch
 @Composable
 fun DetailScreen(
     viewModel: DetailViewModel,
-    websiteId: Int
+    websiteId: Int,
+    onBackIconClick: () -> Unit
 ) {
 
     when (val screenState = viewModel.getScreenState(websiteId)) {
         is DetailScreenState.Initial -> {}
         is DetailScreenState.RefactorState -> {
-            DetailScreenContent(website = screenState.website)
+            DetailScreenContent(website = screenState.website, onBackIconClick = onBackIconClick)
         }
         is DetailScreenState.AddState -> {
             val emptyWebsite = Website(
@@ -73,7 +77,7 @@ fun DetailScreen(
                 name = "",
                 accountList = arrayListOf(WebsiteAccount(cipherLogin = "", cipherPassword = "", comment = ""))
             )
-            DetailScreenContent(website = emptyWebsite)
+            DetailScreenContent(website = emptyWebsite, onBackIconClick = onBackIconClick)
         }
 
     }
@@ -81,22 +85,24 @@ fun DetailScreen(
 
 @Composable
 fun DetailScreenContent(
-    website: Website
+    website: Website,
+    onBackIconClick: () -> Unit
 ) {
     Scaffold(
-        topBar = { TopAppBarDetail() },
+        topBar = { TopAppBarDetail(onBackIconClick) },
         bottomBar = { BottomAppBarDetail() }
     ) {
         val openBottomSheet = rememberSaveable { mutableStateOf(false) }
-//        val scrollState = rememberScrollState()
+
         ModalBottomSheetSample(openBottomSheet = openBottomSheet)
 
         Column(modifier = Modifier
             .padding(it)
             .padding(horizontal = 18.dp)
             .fillMaxSize()
-//            .verticalScroll()
+            .verticalScroll(rememberScrollState())
         ) {
+            Spacer(modifier = Modifier.height(8.dp))
             CustomTextField(
                 label = stringResource(R.string.name_website),
                 text1 = website.name
@@ -107,11 +113,12 @@ fun DetailScreenContent(
                 text1 = website.address
             )
             Spacer(modifier = Modifier.height(8.dp))
-
             ListOfAccounts(
                 listOfAccounts = website.accountList,
                 onIconClickListener = {openBottomSheet.value = true}
             )
+
+
             Spacer(modifier = Modifier.height(8.dp))
         }
     }
@@ -389,7 +396,9 @@ private fun BottomAppBarDetail() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopAppBarDetail() {
+private fun TopAppBarDetail(
+    onBackIconClick: () -> Unit
+) {
         TopAppBar(
             title = {
                 Text(
@@ -399,13 +408,14 @@ private fun TopAppBarDetail() {
                 )
             },
             navigationIcon = {
-                IconButton(onClick = { /* doSomething() */ }) {
+                IconButton(onClick = { onBackIconClick() }) {
                     Icon(
                         imageVector = Icons.Filled.Close,
                         contentDescription = stringResource(R.string.close_detail_screen)
                     )
                 }
-            }
+            },
+            modifier = Modifier.shadow(elevation = 5.dp)
         )
 }
 
@@ -415,8 +425,12 @@ private fun ListOfAccounts(
     onIconClickListener: () -> Unit
 ) {
     LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(vertical = 8.dp)
+            .height(460.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        userScrollEnabled = false
     ) {
         items(items = listOfAccounts, key = { it.id }) { account ->
             AccountItem (
