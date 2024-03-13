@@ -64,7 +64,6 @@ fun MainScreen(viewModel: MainViewModel, onWebsiteClickListener: (Int) -> Unit) 
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreenContent(
     viewModel: MainViewModel,

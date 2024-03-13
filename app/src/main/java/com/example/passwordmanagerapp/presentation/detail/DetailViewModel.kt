@@ -2,7 +2,7 @@ package com.example.passwordmanagerapp.presentation.detail
 
 import android.app.Application
 import android.util.Log
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.passwordmanagerapp.data.repositories.RepositoryWebsiteImpl
 import com.example.passwordmanagerapp.domain.entities.Website
@@ -13,10 +13,11 @@ import com.example.passwordmanagerapp.domain.usecases.website.RefactorWebsiteUse
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class DetailViewModel (
+class DetailViewModel @Inject constructor (
     application: Application
-): ViewModel() {
+): AndroidViewModel(application) {
     private val repository = RepositoryWebsiteImpl(application)
 
     private val getWebsiteInfoUseCase = GetWebsiteInfoUseCase(repository)

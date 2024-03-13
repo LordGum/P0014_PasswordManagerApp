@@ -2,4 +2,18 @@
     <string name="app_name">PasswordManagerApp</string>
     <string name="list_is_empty">Список пуст</string>
     <string name="add_password">добавить пароль</string>
+    <string name="show_password">Показать пароль</string>
+    <string name="hide_password">спрятать пароль</string>
+    <string name="Account">Аккаунт</string>
+    <string name="login">Логин</string>
+    <string name="comment">Комментарий</string>
+    <string name="save">Сохранить</string>
+    <string name="add_account">Еще один аккаунт</string>
+    <string name="save_changes">Сохранить</string>
+    <string name="close_detail_screen">Закрыть экран редактирования</string>
+    <string name="websote">Сайт</string>
+    <string name="website">Адрес сайта</string>
+    <string name="name_website">Название</string>
+    <string name="delete_account">Удалить аккаунт</string>
+    <string name="enter_password">Введите пароль</string>
 </resources>

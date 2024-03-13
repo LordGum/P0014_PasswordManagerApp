@@ -8,6 +8,7 @@ import com.example.passwordmanagerapp.navigation.AppNavGraph
 import com.example.passwordmanagerapp.navigation.Screen
 import com.example.passwordmanagerapp.navigation.rememberNavigationState
 import com.example.passwordmanagerapp.presentation.detail.DetailScreen
+import com.example.passwordmanagerapp.presentation.detail.DetailViewModel
 import com.example.passwordmanagerapp.presentation.main.MainScreen
 import com.example.passwordmanagerapp.presentation.main.MainViewModel
 
@@ -34,7 +35,8 @@ fun BaseScreen() {
             )
         },
         detailScreenContent = {
-            DetailScreen(it)
+            val viewModel: DetailViewModel = ViewModelProvider(LocalContext.current as ComponentActivity)[DetailViewModel::class.java]
+            DetailScreen(viewModel, it)
         }
     )
 }
