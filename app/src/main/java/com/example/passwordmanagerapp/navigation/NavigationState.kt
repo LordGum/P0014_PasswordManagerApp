@@ -18,6 +18,10 @@ class NavigationState(
             restoreState = true
         }
     }
+
+    fun navigateToDetailScreen(id: Int) {
+        navHostController.navigate(Screen.DetailScreen.getArgs(id))
+    }
 }
 
 @Composable

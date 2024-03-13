@@ -2,15 +2,17 @@ package com.example.passwordmanagerapp.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 
 @Composable
 fun AppNavGraph(
     navHostController: NavHostController,
     enterScreenContent: @Composable () -> Unit,
     mainScreenContent: @Composable () -> Unit,
-    detailScreenContent: @Composable () -> Unit,
+    detailScreenContent: @Composable (Int) -> Unit,
 
     ) {
     NavHost(
@@ -23,8 +25,16 @@ fun AppNavGraph(
         composable(Screen.MainScreen.route) {
             mainScreenContent()
         }
-        composable(Screen.DetailScreen.route) {
-            detailScreenContent()
+        composable(
+            route = Screen.DetailScreen.route,
+            arguments = listOf(
+                navArgument(Screen.WEBSITE_ID) {
+                    type = NavType.IntType
+                }
+            )
+        ) {
+            val id = it.arguments?.getInt(Screen.WEBSITE_ID) ?: -1
+            detailScreenContent(id)
         }
     }
 }

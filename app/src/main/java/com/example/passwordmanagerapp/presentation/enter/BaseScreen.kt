@@ -29,12 +29,12 @@ fun BaseScreen() {
             MainScreen(
                 viewModel,
                 onWebsiteClickListener = {
-                    navigationState.navigateTo(Screen.DetailScreen.route) //TODO нужно добавить параметр website
+                    navigationState.navigateToDetailScreen(it)
                 }
             )
         },
         detailScreenContent = {
-            DetailScreen()
+            DetailScreen(it)
         }
     )
 }

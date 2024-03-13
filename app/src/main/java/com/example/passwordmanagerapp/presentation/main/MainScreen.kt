@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.sp
 import com.example.passwordmanagerapp.domain.entities.Website
 
 @Composable
-fun MainScreen(viewModel: MainViewModel, onWebsiteClickListener: () -> Unit) {
+fun MainScreen(viewModel: MainViewModel, onWebsiteClickListener: (Int) -> Unit) {
 
     val screenState = viewModel.screenState.collectAsState(MainScreenState.Initial)
 
@@ -54,7 +54,9 @@ fun MainScreen(viewModel: MainViewModel, onWebsiteClickListener: () -> Unit) {
                 onWebsiteClickListener = onWebsiteClickListener
             )
         }
-        MainScreenState.Initial -> {}
+        MainScreenState.Initial -> {
+            InitialScreen(onAddClickListener = onWebsiteClickListener)
+        }
 
     }
 }
@@ -64,7 +66,7 @@ fun MainScreen(viewModel: MainViewModel, onWebsiteClickListener: () -> Unit) {
 fun MainScreenContent(
     viewModel: MainViewModel,
     list: List<Website>,
-    onWebsiteClickListener: () -> Unit
+    onWebsiteClickListener: (Int) -> Unit
 ) {
     val listState = rememberLazyListState()
     val expandedFab = remember {
@@ -78,7 +80,7 @@ fun MainScreenContent(
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = {
-                    onWebsiteClickListener()
+                    onWebsiteClickListener(-1)
                 },
                 expanded = expandedFab.value,
                 icon = { Icon(Icons.Filled.Add, null) },
@@ -110,14 +112,14 @@ fun MainScreenContent(
 @Composable
 fun WebsiteCard(
     website: Website,
-    onWebsiteClickListener: () -> Unit
+    onWebsiteClickListener: (Int) -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(72.dp)
             .clickable {
-                onWebsiteClickListener()
+                onWebsiteClickListener(website.id)
             },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
@@ -139,6 +141,41 @@ fun WebsiteCard(
             Spacer(modifier = Modifier.width(8.dp))
             Text(fontSize = 20.sp, text = website.name)
         }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun InitialScreen(
+    onAddClickListener: (Int) -> Unit
+) {
+    val listState = rememberLazyListState()
+    val expandedFab = remember {
+        derivedStateOf {
+            listState.firstVisibleItemIndex == 0
+        }
+    }
+
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.onSecondary,
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                onClick = {
+                    onAddClickListener(-1)
+                },
+                expanded = expandedFab.value,
+                icon = { Icon(Icons.Filled.Add, null) },
+                text = { Text(text = "Add password") },
+            )
+        },
+        floatingActionButtonPosition = FabPosition.End,
+    ) { paddingValues ->
+        Text(
+            modifier = Modifier
+                .padding(paddingValues),
+            text = "no data"
+        )
     }
 }
 
