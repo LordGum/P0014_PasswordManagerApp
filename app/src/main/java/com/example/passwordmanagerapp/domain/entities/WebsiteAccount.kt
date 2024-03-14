@@ -6,9 +6,9 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class WebsiteAccount (
-    val id: Int = Website.UNDEFINED_ID,
-    val cipherLogin: String,
-    val cipherPassword: String,
+    val id: Int = UNDEFINED_ID,
+    var cipherLogin: String,
+    var cipherPassword: String,
     var comment: String = ""
 ):Parcelable {
     companion object {

@@ -4,16 +4,10 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.passwordmanagerapp.data.repositories.RepositoryAccountImpl
 import com.example.passwordmanagerapp.data.repositories.RepositoryWebsiteImpl
 import com.example.passwordmanagerapp.domain.entities.Website
-import com.example.passwordmanagerapp.domain.entities.WebsiteAccount
-import com.example.passwordmanagerapp.domain.usecases.account.AddAccountUseCase
-import com.example.passwordmanagerapp.domain.usecases.account.DeleteAccountUseCase
 import com.example.passwordmanagerapp.domain.usecases.website.AddWebsiteUseCase
-import com.example.passwordmanagerapp.domain.usecases.website.DeleteWebsiteUseCase
 import com.example.passwordmanagerapp.domain.usecases.website.GetWebsiteInfoUseCase
-import com.example.passwordmanagerapp.domain.usecases.website.RefactorWebsiteUseCase
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -24,15 +18,10 @@ class DetailViewModel @Inject constructor (
 ): AndroidViewModel(application) {
 
     private val repositoryWebsite = RepositoryWebsiteImpl(application)
-    private val repositoryAccount = RepositoryAccountImpl()
 
     private val getWebsiteInfoUseCase = GetWebsiteInfoUseCase(repositoryWebsite)
-    private val refactorWebsiteUseCase = RefactorWebsiteUseCase(repositoryWebsite)
     private val addWebsiteUseCase = AddWebsiteUseCase(repositoryWebsite)
-    private val deleteWebsiteUseCase = DeleteWebsiteUseCase(repositoryWebsite)
 
-    private val addAccountUseCase = AddAccountUseCase(repositoryAccount)
-    private val deleteAccountUseCase = DeleteAccountUseCase(repositoryAccount)
 
     private val exceptionHandler = CoroutineExceptionHandler { _, _ ->
         Log.d("DetailViewModel", "Exception caught by exception handler")
@@ -41,10 +30,15 @@ class DetailViewModel @Inject constructor (
 
     private val _websiteInfo = MutableStateFlow<Website?>(null)
 
+
     fun getScreenState(id: Int): DetailScreenState {
         if (id == -1) return DetailScreenState.AddState
         if (id >= 0) {
-            getWebsiteInfo(id)
+            viewModelScope.launch(exceptionHandler) {
+                val r = getWebsiteInfoUseCase(id)
+                //val t: Website = _websiteInfo.value as Website
+                Log.d("MATAG", "website = ${r.name}")
+            }
             return DetailScreenState.RefactorState(
                 _websiteInfo.value ?: throw RuntimeException("websiteInfo is null")
             )
@@ -58,11 +52,6 @@ class DetailViewModel @Inject constructor (
         }
     }
 
-    fun refactorWebsite(website: Website) {
-        viewModelScope.launch(exceptionHandler) {
-            refactorWebsiteUseCase(website)
-        }
-    }
 
     fun addWebsite(website: Website) {
         viewModelScope.launch(exceptionHandler) {
@@ -70,17 +59,4 @@ class DetailViewModel @Inject constructor (
         }
     }
 
-    fun deleteWebsite(id: Int) {
-        viewModelScope.launch(exceptionHandler) {
-            deleteWebsiteUseCase(id)
-        }
-    }
-
-    fun addAccount(website: Website, account: WebsiteAccount) {
-        addAccountUseCase(website, account)
-    }
-
-    fun deleteAccount(website: Website, account: WebsiteAccount) {
-        deleteAccountUseCase(website, account)
-    }
 }

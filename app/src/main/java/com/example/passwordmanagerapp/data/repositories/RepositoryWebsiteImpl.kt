@@ -3,6 +3,7 @@ package com.example.passwordmanagerapp.data.repositories
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
+import android.util.Log
 import androidx.activity.ComponentActivity
 import coil.imageLoader
 import coil.request.ImageRequest
@@ -29,8 +30,9 @@ class RepositoryWebsiteImpl(
     }
 
     override suspend fun addWebsite(website: Website) {
-        val bmp = urlToBitmap(website.address)
-        saveImage(website.iconFileName, bmp)
+        // TODO (ПРОБЛЕМА С СОХРАНЕНИЕМ)
+        //val bmp = urlToBitmap(website.address)
+        //saveImage(website.iconFileName, bmp)
         websiteDao.addWebsite(mapper.entityToDbModel(website))
     }
 
@@ -45,6 +47,9 @@ class RepositoryWebsiteImpl(
     }
 
     override suspend fun getWebsiteInfo(idWebsite: Int): Website {
+        Log.d("MATAG", "id in rep = $idWebsite")
+        val e = websiteDao.getWebsiteInfo(idWebsite)
+        Log.d("MATAG", "info = ${e.name}")
         return mapper.dbModelToEntity(websiteDao.getWebsiteInfo(idWebsite))
     }
 

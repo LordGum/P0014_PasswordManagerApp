@@ -1,5 +1,6 @@
 package com.example.passwordmanagerapp.presentation.enter
 
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
@@ -34,11 +35,12 @@ fun BaseScreen() {
                 }
             )
         },
-        detailScreenContent = {
+        detailScreenContent = {id ->
+            Log.d("MATAG", "id = $id")
             val viewModel: DetailViewModel = ViewModelProvider(LocalContext.current as ComponentActivity)[DetailViewModel::class.java]
             DetailScreen(
                 viewModel,
-                it,
+                id,
                 onBackIconClick = {
                     navigationState.navHostController.popBackStack()
                 }

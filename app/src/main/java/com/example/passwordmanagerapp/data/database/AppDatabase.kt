@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(entities = [WebsiteDbModel::class], version = 5, exportSchema = false)
+@Database(entities = [WebsiteDbModel::class], version = 6, exportSchema = false)
 @TypeConverters(DataConverter::class)
 abstract class AppDatabase: RoomDatabase() {
     companion object {

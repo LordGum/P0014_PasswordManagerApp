@@ -1,6 +1,5 @@
 package com.example.passwordmanagerapp.presentation.detail
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -60,9 +59,9 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.passwordmanagerapp.R
+import com.example.passwordmanagerapp.domain.entities.Website
 import com.example.passwordmanagerapp.domain.entities.WebsiteAccount
 import com.example.passwordmanagerapp.presentation.detail.entities_states.WebsiteState
-import com.example.passwordmanagerapp.presentation.detail.entities_states.rememberWebsiteState
 import kotlinx.coroutines.launch
 
 
@@ -80,25 +79,37 @@ fun DetailScreen(
             val listOfAccounts = remember {
                 mutableStateListOf<WebsiteAccount>()
             }
-            val websiteState = rememberWebsiteState(
-                address = screenState.website.address,
-                name = screenState.website.name,
-                accountList = screenState.website.accountList
-            )
+            val websiteState =  mutableStateOf(WebsiteState(
+                screenState.website.name,
+                screenState.website.address,
+                screenState.website.accountList
+            ))
 
             DetailScreenContent(
                 website = websiteState,
                 onBackIconClick = onBackIconClick,
-                viewModel = viewModel,
-                onWebsiteStateChange = {
-                    websiteState.value = it
-                },
                 listOfAccounts = listOfAccounts,
                 onAccountListChange = {account, action ->
                     when(action) {
                         Action.ADD -> listOfAccounts.add(account)
                         Action.DELETE -> listOfAccounts.remove(account)
                     }
+                },
+                onAccountTextChange = {
+                    websiteState.value.accountList = listOfAccounts.toList()
+                },
+                onWebsiteStateChange = {
+                    websiteState.value = it
+                },
+                onSaveClick = {
+                    val websiteEntity = Website(
+                        name = websiteState.value.name,
+                        address = websiteState.value.address,
+                        accountList = websiteState.value.accountList as ArrayList<WebsiteAccount>
+                    )
+                    viewModel.addWebsite(websiteEntity)
+
+                    onBackIconClick()
                 }
             )
         }
@@ -109,21 +120,14 @@ fun DetailScreen(
             val listOfAccounts = remember {
                 mutableStateListOf(account)
             }
-            val websiteState = rememberWebsiteState(
-                address = "",
-                name = "",
-                accountList = arrayListOf(account)
-            )
+            val websiteState = rememberSaveable {
+                mutableStateOf(WebsiteState("", "", arrayListOf(account)))
+            }
 
-            Log.d("MATAG", "website state = ${websiteState.value.accountList.size}")
 
             DetailScreenContent(
                 website = websiteState,
                 onBackIconClick = onBackIconClick,
-                viewModel = viewModel,
-                onWebsiteStateChange = {
-                    websiteState.value = it
-                },
                 listOfAccounts = listOfAccounts,
                 onAccountListChange = {account, action ->
                     when(action) {
@@ -131,6 +135,23 @@ fun DetailScreen(
                         Action.DELETE -> listOfAccounts.remove(account)
                     }
                     websiteState.value.accountList = listOfAccounts.toList()
+                },
+                onAccountTextChange = {
+                    websiteState.value.accountList = listOfAccounts.toList()
+                },
+                onWebsiteStateChange = {
+                    websiteState.value = it
+                },
+                onSaveClick = {
+                    val websiteEntity = Website(
+                        name = websiteState.value.name,
+                        address = websiteState.value.address,
+                        accountList = websiteState.value.accountList as ArrayList<WebsiteAccount>
+                    )
+
+                    viewModel.addWebsite(websiteEntity)
+
+                    onBackIconClick()
                 }
             )
         }
@@ -142,14 +163,15 @@ fun DetailScreen(
 fun DetailScreenContent(
     website: State<WebsiteState>,
     onBackIconClick: () -> Unit,
-    viewModel: DetailViewModel,
-    onWebsiteStateChange: (WebsiteState) -> Unit,
     listOfAccounts: List<WebsiteAccount>,
-    onAccountListChange: (WebsiteAccount, Action) -> Unit
+    onAccountListChange: (WebsiteAccount, Action) -> Unit,
+    onAccountTextChange: (MutableList<WebsiteAccount>) -> Unit,
+    onWebsiteStateChange: (WebsiteState) -> Unit,
+    onSaveClick: () -> Unit
 ) {
     Scaffold(
         topBar = { TopAppBarDetail(onBackIconClick) },
-        bottomBar = { BottomAppBarDetail(website, onAccountListChange) }
+        bottomBar = { BottomAppBarDetail(website, onAccountListChange, onSaveClick) }
     ) {
         val openBottomSheet = rememberSaveable { mutableStateOf(false) }
         var websiteAccount = if(website.value.accountList.isNotEmpty()) website.value.accountList[0]
@@ -159,9 +181,7 @@ fun DetailScreenContent(
         ModalBottomSheetSample(
             website = website,
             account = websiteAccount,
-            viewModel = viewModel,
             openBottomSheet = openBottomSheet,
-            onWebsiteStateChange = onWebsiteStateChange,
             onAccountListChange = onAccountListChange
         )
 
@@ -174,12 +194,20 @@ fun DetailScreenContent(
             Spacer(modifier = Modifier.height(8.dp))
             CustomTextField(
                 label = stringResource(R.string.name_website),
-                text1 = website.value.name
+                text1 = website.value.name,
+                onTextChange = { name ->
+                    website.value.name = name
+                    onWebsiteStateChange(website.value)
+                }
             )
             Spacer(modifier = Modifier.height(8.dp))
             CustomTextField(
                 label = stringResource(R.string.website),
-                text1 = website.value.address
+                text1 = website.value.address,
+                onTextChange = { address ->
+                    website.value.address = address
+                    onWebsiteStateChange(website.value)
+                }
             )
             Spacer(modifier = Modifier.height(8.dp))
             ListOfAccounts(
@@ -187,7 +215,8 @@ fun DetailScreenContent(
                 onIconClickListener = { account ->
                     websiteAccount = account
                     openBottomSheet.value = true
-                }
+                },
+                onAccountListChange = onAccountTextChange
             )
 
 
@@ -197,25 +226,37 @@ fun DetailScreenContent(
 }
 
 @Composable
-private fun CustomTextField(label: String, text1: String) {
+private fun CustomTextField(
+    label: String, text1: String,
+    onTextChange: (String) -> Unit
+) {
     val text = rememberSaveable{ mutableStateOf(text1) }
 
     OutlinedTextField(
         value = text.value,
-        onValueChange = {text.value = it},
+        onValueChange = {  newText ->
+            text.value = newText
+            onTextChange(newText)
+        },
         label = {Text(label)},
         modifier = Modifier.fillMaxWidth()
     )
 }
 
 @Composable
-private fun PasswordTextField(text1: String) {
+private fun PasswordTextField(
+    text1: String,
+    onTextChange: (String) -> Unit
+) {
     var password by rememberSaveable { mutableStateOf(text1) }
     var passwordHidden by rememberSaveable { mutableStateOf(true) }
 
     OutlinedTextField(
         value = password,
-        onValueChange = { password = it },
+        onValueChange = {  newText ->
+            password = newText
+            onTextChange(newText)
+        },
         singleLine = true,
         label = { Text(stringResource(R.string.enter_password)) },
         visualTransformation =
@@ -238,12 +279,15 @@ private fun PasswordTextField(text1: String) {
 @Composable
 private fun AccountItem(
     account: WebsiteAccount,
-    onIconClickListener: (WebsiteAccount) -> Unit
+    onIconClickListener: (WebsiteAccount) -> Unit,
+    onLoginChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onCommentChange: (String) -> Unit
 ) {
     Card(
         Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0x336650a4) //TODO
+            containerColor = Color(0x336650a4)
         ),
 
     ) {
@@ -266,12 +310,24 @@ private fun AccountItem(
                 }
             }
 
-            CustomTextField(label = stringResource(R.string.login), text1 = account.cipherLogin)
-            Spacer(modifier = Modifier.height(8.dp))
-            PasswordTextField(text1 = account.cipherPassword)
+            CustomTextField(
+                label = stringResource(R.string.login),
+                text1 = account.cipherLogin,
+                onTextChange = onLoginChange
+            )
             Spacer(modifier = Modifier.height(8.dp))
 
-            CustomTextField(label = stringResource(R.string.comment), text1 = account.comment)
+            PasswordTextField(
+                text1 = account.cipherPassword,
+                onTextChange = onPasswordChange
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            CustomTextField(
+                label = stringResource(R.string.comment),
+                text1 = account.comment,
+                onTextChange = onCommentChange
+            )
             Spacer(modifier = Modifier.height(18.dp))
         }
     }
@@ -282,12 +338,9 @@ private fun AccountItem(
 private fun ModalBottomSheetSample(
     website: State<WebsiteState>,
     account: WebsiteAccount,
-    viewModel: DetailViewModel,
     openBottomSheet: MutableState<Boolean>,
-    onWebsiteStateChange: (WebsiteState) -> Unit,
     onAccountListChange: (WebsiteAccount, Action) -> Unit
 ) {
-    val currentWebsite = website.value
     val skipPartiallyExpanded by remember { mutableStateOf(false) }
     val edgeToEdgeEnabled by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
@@ -323,7 +376,6 @@ private fun ModalBottomSheetSample(
                                     newAccount,
                                     Action.ADD
                                 )
-                                //viewModel.addAccount(website.value, account)
                                 openBottomSheet.value = false
                             }
                         }
@@ -345,7 +397,6 @@ private fun ModalBottomSheetSample(
                                     account,
                                     Action.DELETE
                                 )
-                                //viewModel.deleteAccount(website, account)
                                 openBottomSheet.value = false
                             }
                         }
@@ -449,7 +500,8 @@ private var _visibilityOff: ImageVector? = null
 @Composable
 private fun BottomAppBarDetail(
     website: State<WebsiteState>,
-    onAccountListChange: (WebsiteAccount, Action) -> Unit
+    onAccountListChange: (WebsiteAccount, Action) -> Unit,
+    onSaveClick: () -> Unit
 ) {
     BottomAppBar(
         modifier = Modifier.height(120.dp),
@@ -461,7 +513,6 @@ private fun BottomAppBarDetail(
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp),
                     onClick = {
-                        Log.d("MATAG", "refresh account size = ${website.value.accountList.size}")
                         val newAccount = WebsiteAccount(
                             id = if(website.value.accountList.isNotEmpty())
                                 website.value.accountList[website.value.accountList.lastIndex].id + 1
@@ -469,10 +520,7 @@ private fun BottomAppBarDetail(
                             cipherLogin = "",
                             cipherPassword = ""
                         )
-                        onAccountListChange(
-                            newAccount,
-                            Action.ADD
-                        )
+                        onAccountListChange(newAccount, Action.ADD)
                     }
                 ) {
                     Icon(imageVector = Icons.Rounded.Add, contentDescription = stringResource(R.string.add_account))
@@ -483,7 +531,7 @@ private fun BottomAppBarDetail(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp),
-                    onClick = { /*TODO*/ }
+                    onClick = { onSaveClick() }
                 ) {
                     Text(text = stringResource(R.string.save_changes), color = Color.White)
                 }
@@ -522,20 +570,33 @@ private fun TopAppBarDetail(
 @Composable
 private fun ListOfAccounts(
     listOfAccounts: MutableList<WebsiteAccount>,
-    onIconClickListener: (WebsiteAccount) -> Unit
+    onIconClickListener: (WebsiteAccount) -> Unit,
+    onAccountListChange: (MutableList<WebsiteAccount>) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(vertical = 8.dp)
-            .height((460 + 110 * (listOfAccounts.size - 1)).dp),
+            .height((460 + 280 * (listOfAccounts.size - 1)).dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         userScrollEnabled = false
     ) {
         items(items = listOfAccounts, key = { it.id }) { account ->
             AccountItem (
                 account = account,
-                onIconClickListener = onIconClickListener
+                onIconClickListener = onIconClickListener,
+                onLoginChange = { login ->
+                    account.cipherLogin = login
+                    onAccountListChange(listOfAccounts)
+                },
+                onPasswordChange = { password ->
+                    account.cipherPassword = password
+                    onAccountListChange(listOfAccounts)
+                },
+                onCommentChange = { comment ->
+                    account.comment = comment
+                    onAccountListChange(listOfAccounts)
+                }
             )
             Spacer(modifier = Modifier.height(8.dp))
         }

@@ -1,5 +1,6 @@
 package com.example.passwordmanagerapp.presentation.main
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,13 +20,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -57,7 +57,8 @@ fun MainScreen(viewModel: MainViewModel, onWebsiteClickListener: (Int) -> Unit) 
                 onWebsiteClickListener = onWebsiteClickListener
             )
         }
-        MainScreenState.Initial -> {
+        is MainScreenState.Initial -> {
+            Log.d("MATAG", "initial")
             InitialScreen(onAddClickListener = onWebsiteClickListener)
         }
 
@@ -86,7 +87,7 @@ fun MainScreenContent(
                 },
                 expanded = expandedFab.value,
                 icon = { Icon(Icons.Filled.Add, null) },
-                text = { Text(text = "Add password") },
+                text = { Text(text = stringResource(R.string.add_password)) },
             )
         },
         floatingActionButtonPosition = FabPosition.End,
@@ -111,13 +112,12 @@ fun MainScreenContent(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WebsiteCard(
     website: Website,
     onWebsiteClickListener: (Int) -> Unit
 ) {
-    Card(
+    OutlinedCard(
         onClick = {
             onWebsiteClickListener(website.id)
         },
@@ -126,8 +126,8 @@ fun WebsiteCard(
             .height(72.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.onPrimary,
-            contentColor = MaterialTheme.colorScheme.onSecondary
+            containerColor = MaterialTheme.colorScheme.onSecondary,
+            contentColor = MaterialTheme.colorScheme.primary
         )
     ) {
         Row (
@@ -148,7 +148,6 @@ fun WebsiteCard(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InitialScreen(
     onAddClickListener: (Int) -> Unit
@@ -169,17 +168,23 @@ fun InitialScreen(
                 },
                 expanded = expandedFab.value,
                 icon = { Icon(Icons.Filled.Add, null) },
-                text = { Text(text = stringResource(R.string.add_password)) },
+                text = { Text(
+                    color = MaterialTheme.colorScheme.primary,
+                    text = stringResource(R.string.add_password)
+                ) }
             )
         },
         floatingActionButtonPosition = FabPosition.End,
     ) { paddingValues ->
 
         Box(
-            modifier = Modifier.fillMaxSize().padding(paddingValues),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
             contentAlignment = Alignment.Center) {
             Text(
                 text = stringResource(R.string.list_is_empty),
+                color = MaterialTheme.colorScheme.primary,
                 textAlign = TextAlign.Center)
         }
 
