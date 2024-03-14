@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.materialIcon
 import androidx.compose.material.icons.materialPath
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomSheetDefaults
@@ -29,15 +30,19 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -55,8 +60,9 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.passwordmanagerapp.R
-import com.example.passwordmanagerapp.domain.entities.Website
 import com.example.passwordmanagerapp.domain.entities.WebsiteAccount
+import com.example.passwordmanagerapp.presentation.detail.entities_states.WebsiteState
+import com.example.passwordmanagerapp.presentation.detail.entities_states.rememberWebsiteState
 import kotlinx.coroutines.launch
 
 
@@ -70,22 +76,62 @@ fun DetailScreen(
     when (val screenState = viewModel.getScreenState(websiteId)) {
         is DetailScreenState.Initial -> {}
         is DetailScreenState.RefactorState -> {
+
+            val listOfAccounts = remember {
+                mutableStateListOf<WebsiteAccount>()
+            }
+            val websiteState = rememberWebsiteState(
+                address = screenState.website.address,
+                name = screenState.website.name,
+                accountList = screenState.website.accountList
+            )
+
             DetailScreenContent(
-                website = screenState.website,
+                website = websiteState,
                 onBackIconClick = onBackIconClick,
-                viewModel = viewModel
+                viewModel = viewModel,
+                onWebsiteStateChange = {
+                    websiteState.value = it
+                },
+                listOfAccounts = listOfAccounts,
+                onAccountListChange = {account, action ->
+                    when(action) {
+                        Action.ADD -> listOfAccounts.add(account)
+                        Action.DELETE -> listOfAccounts.remove(account)
+                    }
+                }
             )
         }
         is DetailScreenState.AddState -> {
-            val emptyWebsite = Website(
+            val account = WebsiteAccount(
+                cipherLogin = "", cipherPassword = "", comment = ""
+            )
+            val listOfAccounts = remember {
+                mutableStateListOf(account)
+            }
+            val websiteState = rememberWebsiteState(
                 address = "",
                 name = "",
-                accountList = arrayListOf(WebsiteAccount(cipherLogin = "", cipherPassword = "", comment = ""))
+                accountList = arrayListOf(account)
             )
+
+            Log.d("MATAG", "website state = ${websiteState.value.accountList.size}")
+
             DetailScreenContent(
-                website = emptyWebsite,
+                website = websiteState,
                 onBackIconClick = onBackIconClick,
-                viewModel = viewModel
+                viewModel = viewModel,
+                onWebsiteStateChange = {
+                    websiteState.value = it
+                },
+                listOfAccounts = listOfAccounts,
+                onAccountListChange = {account, action ->
+                    when(action) {
+                        Action.ADD -> listOfAccounts.add(account)
+                        Action.DELETE -> listOfAccounts.remove(account)
+                    }
+                    websiteState.value.accountList = listOfAccounts.toList()
+                }
             )
         }
 
@@ -94,24 +140,29 @@ fun DetailScreen(
 
 @Composable
 fun DetailScreenContent(
-    website: Website,
+    website: State<WebsiteState>,
     onBackIconClick: () -> Unit,
-    viewModel: DetailViewModel
+    viewModel: DetailViewModel,
+    onWebsiteStateChange: (WebsiteState) -> Unit,
+    listOfAccounts: List<WebsiteAccount>,
+    onAccountListChange: (WebsiteAccount, Action) -> Unit
 ) {
     Scaffold(
         topBar = { TopAppBarDetail(onBackIconClick) },
-        bottomBar = { BottomAppBarDetail() }
+        bottomBar = { BottomAppBarDetail(website, onAccountListChange) }
     ) {
         val openBottomSheet = rememberSaveable { mutableStateOf(false) }
-        val websiteAccount = rememberSaveable {
-            mutableStateOf(WebsiteAccount(id = -1, cipherLogin = "", cipherPassword = "", comment = ""))
-        }
+        var websiteAccount = if(website.value.accountList.isNotEmpty()) website.value.accountList[0]
+        else WebsiteAccount(cipherLogin = "", cipherPassword = "")
+
 
         ModalBottomSheetSample(
             website = website,
-            account = websiteAccount.value,
+            account = websiteAccount,
             viewModel = viewModel,
-            openBottomSheet = openBottomSheet
+            openBottomSheet = openBottomSheet,
+            onWebsiteStateChange = onWebsiteStateChange,
+            onAccountListChange = onAccountListChange
         )
 
         Column(modifier = Modifier
@@ -123,18 +174,18 @@ fun DetailScreenContent(
             Spacer(modifier = Modifier.height(8.dp))
             CustomTextField(
                 label = stringResource(R.string.name_website),
-                text1 = website.name
+                text1 = website.value.name
             )
             Spacer(modifier = Modifier.height(8.dp))
             CustomTextField(
                 label = stringResource(R.string.website),
-                text1 = website.address
+                text1 = website.value.address
             )
             Spacer(modifier = Modifier.height(8.dp))
             ListOfAccounts(
-                listOfAccounts = website.accountList,
+                listOfAccounts = listOfAccounts.toMutableList(),
                 onIconClickListener = { account ->
-                    websiteAccount.value = account
+                    websiteAccount = account
                     openBottomSheet.value = true
                 }
             )
@@ -229,12 +280,14 @@ private fun AccountItem(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ModalBottomSheetSample(
-    website: Website,
+    website: State<WebsiteState>,
     account: WebsiteAccount,
     viewModel: DetailViewModel,
-    openBottomSheet: MutableState<Boolean>
+    openBottomSheet: MutableState<Boolean>,
+    onWebsiteStateChange: (WebsiteState) -> Unit,
+    onAccountListChange: (WebsiteAccount, Action) -> Unit
 ) {
-
+    val currentWebsite = website.value
     val skipPartiallyExpanded by remember { mutableStateOf(false) }
     val edgeToEdgeEnabled by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
@@ -261,7 +314,16 @@ private fun ModalBottomSheetSample(
                     onClick = {
                         scope.launch { bottomSheetState.hide() }.invokeOnCompletion {
                             if (!bottomSheetState.isVisible) {
-                                viewModel.addAccount(website, account)
+                                val newAccount = WebsiteAccount(
+                                    id = website.value.accountList[website.value.accountList.lastIndex].id + 1,
+                                    cipherLogin = "",
+                                    cipherPassword = ""
+                                )
+                                onAccountListChange(
+                                    newAccount,
+                                    Action.ADD
+                                )
+                                //viewModel.addAccount(website.value, account)
                                 openBottomSheet.value = false
                             }
                         }
@@ -279,31 +341,17 @@ private fun ModalBottomSheetSample(
                     onClick = {
                         scope.launch { bottomSheetState.hide() }.invokeOnCompletion {
                             if (!bottomSheetState.isVisible) {
-                                viewModel.deleteAccount(website, account)
+                                onAccountListChange(
+                                    account,
+                                    Action.DELETE
+                                )
+                                //viewModel.deleteAccount(website, account)
                                 openBottomSheet.value = false
                             }
                         }
                     }
                 ) {
                     Text(stringResource(R.string.delete_account))
-                }
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                ElevatedButton(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp),
-                    onClick = {
-                        scope.launch { bottomSheetState.hide() }.invokeOnCompletion {
-                            if (!bottomSheetState.isVisible) {
-                                viewModel.addAccount(website, account)
-                                openBottomSheet.value = false
-                            }
-                        }
-                    }
-                ) {
-                    Text(stringResource(R.string.save))
                 }
 
                 Spacer(modifier = Modifier.height(50.dp))
@@ -399,11 +447,38 @@ private var _visibilityOff: ImageVector? = null
 
 
 @Composable
-private fun BottomAppBarDetail() {
+private fun BottomAppBarDetail(
+    website: State<WebsiteState>,
+    onAccountListChange: (WebsiteAccount, Action) -> Unit
+) {
     BottomAppBar(
+        modifier = Modifier.height(120.dp),
         actions = {
             Column {
-                Spacer(modifier = Modifier.height(15.dp))
+                Spacer(modifier = Modifier.height(5.dp))
+                TextButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp),
+                    onClick = {
+                        Log.d("MATAG", "refresh account size = ${website.value.accountList.size}")
+                        val newAccount = WebsiteAccount(
+                            id = if(website.value.accountList.isNotEmpty())
+                                website.value.accountList[website.value.accountList.lastIndex].id + 1
+                            else 0,
+                            cipherLogin = "",
+                            cipherPassword = ""
+                        )
+                        onAccountListChange(
+                            newAccount,
+                            Action.ADD
+                        )
+                    }
+                ) {
+                    Icon(imageVector = Icons.Rounded.Add, contentDescription = stringResource(R.string.add_account))
+                    Text(text = stringResource(R.string.add_account), color = MaterialTheme.colorScheme.primary)
+                }
+                Spacer(modifier = Modifier.height(5.dp))
                 Button(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -446,14 +521,14 @@ private fun TopAppBarDetail(
 
 @Composable
 private fun ListOfAccounts(
-    listOfAccounts: ArrayList<WebsiteAccount>,
+    listOfAccounts: MutableList<WebsiteAccount>,
     onIconClickListener: (WebsiteAccount) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(vertical = 8.dp)
-            .height(460.dp),
+            .height((460 + 110 * (listOfAccounts.size - 1)).dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         userScrollEnabled = false
     ) {
@@ -462,6 +537,11 @@ private fun ListOfAccounts(
                 account = account,
                 onIconClickListener = onIconClickListener
             )
+            Spacer(modifier = Modifier.height(8.dp))
         }
     }
+}
+
+enum class Action {
+    DELETE, ADD
 }
