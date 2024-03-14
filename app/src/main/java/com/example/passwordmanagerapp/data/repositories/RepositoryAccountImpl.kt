@@ -16,8 +16,9 @@ class RepositoryAccountImpl @Inject constructor(
         website.accountList.add(account)
     }
 
-    override fun refactorAccount(website: Website, account: WebsiteAccount, ind: Int) {
-        website.accountList[ind] = account
+    override fun deleteAccount(website: Website, account: WebsiteAccount) {
+        website.accountList.remove(account)
     }
+
 
 }

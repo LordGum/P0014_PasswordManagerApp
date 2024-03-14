@@ -4,8 +4,12 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.passwordmanagerapp.data.repositories.RepositoryAccountImpl
 import com.example.passwordmanagerapp.data.repositories.RepositoryWebsiteImpl
 import com.example.passwordmanagerapp.domain.entities.Website
+import com.example.passwordmanagerapp.domain.entities.WebsiteAccount
+import com.example.passwordmanagerapp.domain.usecases.account.AddAccountUseCase
+import com.example.passwordmanagerapp.domain.usecases.account.DeleteAccountUseCase
 import com.example.passwordmanagerapp.domain.usecases.website.AddWebsiteUseCase
 import com.example.passwordmanagerapp.domain.usecases.website.DeleteWebsiteUseCase
 import com.example.passwordmanagerapp.domain.usecases.website.GetWebsiteInfoUseCase
@@ -18,12 +22,17 @@ import javax.inject.Inject
 class DetailViewModel @Inject constructor (
     application: Application
 ): AndroidViewModel(application) {
-    private val repository = RepositoryWebsiteImpl(application)
 
-    private val getWebsiteInfoUseCase = GetWebsiteInfoUseCase(repository)
-    private val refactorWebsiteUseCase = RefactorWebsiteUseCase(repository)
-    private val addWebsiteUseCase = AddWebsiteUseCase(repository)
-    private val deleteWebsiteUseCase = DeleteWebsiteUseCase(repository)
+    private val repositoryWebsite = RepositoryWebsiteImpl(application)
+    private val repositoryAccount = RepositoryAccountImpl()
+
+    private val getWebsiteInfoUseCase = GetWebsiteInfoUseCase(repositoryWebsite)
+    private val refactorWebsiteUseCase = RefactorWebsiteUseCase(repositoryWebsite)
+    private val addWebsiteUseCase = AddWebsiteUseCase(repositoryWebsite)
+    private val deleteWebsiteUseCase = DeleteWebsiteUseCase(repositoryWebsite)
+
+    private val addAccountUseCase = AddAccountUseCase(repositoryAccount)
+    private val deleteAccountUseCase = DeleteAccountUseCase(repositoryAccount)
 
     private val exceptionHandler = CoroutineExceptionHandler { _, _ ->
         Log.d("DetailViewModel", "Exception caught by exception handler")
@@ -61,9 +70,17 @@ class DetailViewModel @Inject constructor (
         }
     }
 
-    fun delete(id: Int) {
+    fun deleteWebsite(id: Int) {
         viewModelScope.launch(exceptionHandler) {
             deleteWebsiteUseCase(id)
         }
+    }
+
+    fun addAccount(website: Website, account: WebsiteAccount) {
+        addAccountUseCase(website, account)
+    }
+
+    fun deleteAccount(website: Website, account: WebsiteAccount) {
+        deleteAccountUseCase(website, account)
     }
 }

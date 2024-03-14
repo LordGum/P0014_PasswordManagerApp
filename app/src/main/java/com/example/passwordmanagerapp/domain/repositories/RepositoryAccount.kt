@@ -9,5 +9,7 @@ interface RepositoryAccount {
 
      fun addAccount(website: Website, account: WebsiteAccount)
 
-     fun refactorAccount(website: Website, account: WebsiteAccount, ind: Int)
+     fun deleteAccount(website: Website, account: WebsiteAccount)
+
+
 }

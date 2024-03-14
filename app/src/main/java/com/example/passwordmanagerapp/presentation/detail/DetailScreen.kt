@@ -1,5 +1,6 @@
 package com.example.passwordmanagerapp.presentation.detail
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -69,7 +70,11 @@ fun DetailScreen(
     when (val screenState = viewModel.getScreenState(websiteId)) {
         is DetailScreenState.Initial -> {}
         is DetailScreenState.RefactorState -> {
-            DetailScreenContent(website = screenState.website, onBackIconClick = onBackIconClick)
+            DetailScreenContent(
+                website = screenState.website,
+                onBackIconClick = onBackIconClick,
+                viewModel = viewModel
+            )
         }
         is DetailScreenState.AddState -> {
             val emptyWebsite = Website(
@@ -77,7 +82,11 @@ fun DetailScreen(
                 name = "",
                 accountList = arrayListOf(WebsiteAccount(cipherLogin = "", cipherPassword = "", comment = ""))
             )
-            DetailScreenContent(website = emptyWebsite, onBackIconClick = onBackIconClick)
+            DetailScreenContent(
+                website = emptyWebsite,
+                onBackIconClick = onBackIconClick,
+                viewModel = viewModel
+            )
         }
 
     }
@@ -86,15 +95,24 @@ fun DetailScreen(
 @Composable
 fun DetailScreenContent(
     website: Website,
-    onBackIconClick: () -> Unit
+    onBackIconClick: () -> Unit,
+    viewModel: DetailViewModel
 ) {
     Scaffold(
         topBar = { TopAppBarDetail(onBackIconClick) },
         bottomBar = { BottomAppBarDetail() }
     ) {
         val openBottomSheet = rememberSaveable { mutableStateOf(false) }
+        val websiteAccount = rememberSaveable {
+            mutableStateOf(WebsiteAccount(id = -1, cipherLogin = "", cipherPassword = "", comment = ""))
+        }
 
-        ModalBottomSheetSample(openBottomSheet = openBottomSheet)
+        ModalBottomSheetSample(
+            website = website,
+            account = websiteAccount.value,
+            viewModel = viewModel,
+            openBottomSheet = openBottomSheet
+        )
 
         Column(modifier = Modifier
             .padding(it)
@@ -115,7 +133,10 @@ fun DetailScreenContent(
             Spacer(modifier = Modifier.height(8.dp))
             ListOfAccounts(
                 listOfAccounts = website.accountList,
-                onIconClickListener = {openBottomSheet.value = true}
+                onIconClickListener = { account ->
+                    websiteAccount.value = account
+                    openBottomSheet.value = true
+                }
             )
 
 
@@ -166,7 +187,7 @@ private fun PasswordTextField(text1: String) {
 @Composable
 private fun AccountItem(
     account: WebsiteAccount,
-    onIconClickListener: () -> Unit
+    onIconClickListener: (WebsiteAccount) -> Unit
 ) {
     Card(
         Modifier.fillMaxWidth(),
@@ -188,7 +209,7 @@ private fun AccountItem(
                 )
                 IconButton(
                     onClick = {
-                        onIconClickListener()
+                        onIconClickListener(account)
                 }) {
                     Icon(imageVector = Icons.Rounded.MoreVert, contentDescription = null)
                 }
@@ -207,7 +228,12 @@ private fun AccountItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ModalBottomSheetSample(openBottomSheet: MutableState<Boolean>) {
+private fun ModalBottomSheetSample(
+    website: Website,
+    account: WebsiteAccount,
+    viewModel: DetailViewModel,
+    openBottomSheet: MutableState<Boolean>
+) {
 
     val skipPartiallyExpanded by remember { mutableStateOf(false) }
     val edgeToEdgeEnabled by remember { mutableStateOf(false) }
@@ -217,7 +243,6 @@ private fun ModalBottomSheetSample(openBottomSheet: MutableState<Boolean>) {
     )
 
 
-    // Sheet content
     if (openBottomSheet.value) {
         val windowInsets = if (edgeToEdgeEnabled)
             WindowInsets(0) else BottomSheetDefaults.windowInsets
@@ -236,10 +261,10 @@ private fun ModalBottomSheetSample(openBottomSheet: MutableState<Boolean>) {
                     onClick = {
                         scope.launch { bottomSheetState.hide() }.invokeOnCompletion {
                             if (!bottomSheetState.isVisible) {
+                                viewModel.addAccount(website, account)
                                 openBottomSheet.value = false
                             }
                         }
-                        //TODO add add logic
                     }
                 ) {
                     Text(stringResource(R.string.add_account))
@@ -254,10 +279,10 @@ private fun ModalBottomSheetSample(openBottomSheet: MutableState<Boolean>) {
                     onClick = {
                         scope.launch { bottomSheetState.hide() }.invokeOnCompletion {
                             if (!bottomSheetState.isVisible) {
+                                viewModel.deleteAccount(website, account)
                                 openBottomSheet.value = false
                             }
                         }
-                        //TODO delete logic
                     }
                 ) {
                     Text(stringResource(R.string.delete_account))
@@ -272,10 +297,10 @@ private fun ModalBottomSheetSample(openBottomSheet: MutableState<Boolean>) {
                     onClick = {
                         scope.launch { bottomSheetState.hide() }.invokeOnCompletion {
                             if (!bottomSheetState.isVisible) {
+                                viewModel.addAccount(website, account)
                                 openBottomSheet.value = false
                             }
                         }
-                        //TODO add save logic
                     }
                 ) {
                     Text(stringResource(R.string.save))
@@ -422,7 +447,7 @@ private fun TopAppBarDetail(
 @Composable
 private fun ListOfAccounts(
     listOfAccounts: ArrayList<WebsiteAccount>,
-    onIconClickListener: () -> Unit
+    onIconClickListener: (WebsiteAccount) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
