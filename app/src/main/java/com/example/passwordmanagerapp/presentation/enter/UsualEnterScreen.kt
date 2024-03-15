@@ -11,6 +11,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -30,7 +32,10 @@ import com.example.passwordmanagerapp.R
 
 
 @Composable
-fun UsualEnterScreen() {
+fun UsualEnterScreen(
+    isFingerPrintEnable: Boolean,
+    checkPassword: (String) -> Unit
+) {
     val password = rememberSaveable { mutableStateOf("") }
     val errorPassword = rememberSaveable { mutableStateOf(false) }
     val enableButton = rememberSaveable { mutableStateOf(false) }
@@ -52,11 +57,19 @@ fun UsualEnterScreen() {
         )
         Spacer(modifier = Modifier.height(18.dp))
         Button(
-            onClick = { /*TODO*/ },
+            onClick = { checkPassword(password.value) },
             enabled = enableButton.value,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = stringResource(R.string.check), color = Color.White)
+        }
+        Spacer(modifier = Modifier.height(18.dp))
+        if (isFingerPrintEnable) {
+            Text(
+                text = stringResource(R.string.touch_sensor),
+                color = Color(0xFF625b71),
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
         }
     }
 }

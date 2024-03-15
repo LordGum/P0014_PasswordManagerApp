@@ -24,4 +24,5 @@
     <string name="yes">Да</string>
     <string name="no">Нет</string>
     <string name="check">Проверить</string>
+    <string name="touch_sensor">Коснитесь сенсора</string>
 </resources>
