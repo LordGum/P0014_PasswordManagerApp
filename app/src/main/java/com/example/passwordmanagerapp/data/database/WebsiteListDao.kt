@@ -11,12 +11,12 @@ interface WebsiteListDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addWebsite(website: WebsiteDbModel)
 
-    @Query("DELETE FROM websites_list WHERE id=:websiteId")
-    suspend fun deleteWebsite(websiteId: Int)
+    @Query("DELETE FROM websites WHERE id = :id")
+    suspend fun deleteWebsite(id: Int)
 
-    @Query("SELECT * FROM websites_list WHERE id=:websiteId")
-    suspend fun getWebsiteInfo(websiteId: Int): WebsiteDbModel
+    @Query("SELECT * FROM websites WHERE id = :id")
+    suspend fun getWebsiteInfo(id: Int): WebsiteDbModel
 
-    @Query("SELECT * FROM websites_list ORDER BY id")
+    @Query("SELECT * FROM websites ORDER BY id")
     fun getWebsitesList(): Flow<List<WebsiteDbModel>>
 }

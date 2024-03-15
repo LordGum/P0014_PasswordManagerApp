@@ -3,8 +3,9 @@ package com.example.passwordmanagerapp.data.repositories
 import android.content.Context
 import com.example.passwordmanagerapp.domain.repositories.RepositoryMain
 import com.example.passwordmanagerapp.security.CryptoManager
+import javax.inject.Inject
 
-class RepositoryMainImpl (
+class RepositoryMainImpl @Inject constructor(
     private val context: Context,
     private val cryptoManager: CryptoManager
 ): RepositoryMain {

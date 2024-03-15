@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.passwordmanagerapp.domain.entities.Website
 
 class NavigationState(
     val navHostController: NavHostController
@@ -19,8 +20,8 @@ class NavigationState(
         }
     }
 
-    fun navigateToDetailScreen(id: Int) {
-        navHostController.navigate(Screen.DetailScreen.getArgs(id))
+    fun navigateToDetailScreen(website: Website) {
+        navHostController.navigate(Screen.DetailScreen.getArgs(website))
     }
 }
 

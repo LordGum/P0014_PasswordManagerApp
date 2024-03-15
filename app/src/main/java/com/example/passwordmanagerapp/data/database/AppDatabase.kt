@@ -4,10 +4,8 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
 
-@Database(entities = [WebsiteDbModel::class], version = 6, exportSchema = false)
-@TypeConverters(DataConverter::class)
+@Database(entities = [WebsiteDbModel::class], version = 3, exportSchema = false)
 abstract class AppDatabase: RoomDatabase() {
     companion object {
         private var db: AppDatabase? = null
@@ -31,5 +29,5 @@ abstract class AppDatabase: RoomDatabase() {
             }
         }
     }
-    abstract fun recordDao(): WebsiteListDao
+    abstract fun websiteDao(): WebsiteListDao
 }

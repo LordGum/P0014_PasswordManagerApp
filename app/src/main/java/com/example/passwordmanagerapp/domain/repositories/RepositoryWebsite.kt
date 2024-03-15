@@ -11,8 +11,8 @@ interface RepositoryWebsite {
 
     suspend fun refactorWebsite(website: Website)
 
-    suspend fun deleteWebsite(idWebsite: Int)
+    suspend fun deleteWebsite(id: Int)
 
-    suspend fun getWebsiteInfo(idWebsite: Int): Website
+    suspend fun getWebsiteInfo(id: Int): Website
 
 }

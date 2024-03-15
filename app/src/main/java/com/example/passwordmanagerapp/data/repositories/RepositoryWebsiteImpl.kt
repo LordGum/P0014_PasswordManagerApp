@@ -1,26 +1,26 @@
 package com.example.passwordmanagerapp.data.repositories
 
-import android.content.Context
+import android.app.Application
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
-import android.util.Log
 import androidx.activity.ComponentActivity
 import coil.imageLoader
 import coil.request.ImageRequest
-import com.example.passwordmanagerapp.data.database.AppDatabase
+import com.example.passwordmanagerapp.data.database.WebsiteListDao
 import com.example.passwordmanagerapp.data.mappers.Mapper
 import com.example.passwordmanagerapp.domain.entities.Website
 import com.example.passwordmanagerapp.domain.repositories.RepositoryWebsite
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.io.IOException
+import javax.inject.Inject
 
-class RepositoryWebsiteImpl(
-    private val application: Context
+class RepositoryWebsiteImpl @Inject constructor(
+    private val application: Application,
+    private val mapper: Mapper,
+    private val websiteDao: WebsiteListDao
 ) : RepositoryWebsite {
 
-    private val websiteDao = AppDatabase.getInstance(application).recordDao()
-    private val mapper = Mapper()
 
 
     override val websitesList: Flow<List<Website>> = websiteDao.getWebsitesList().map {
@@ -42,15 +42,13 @@ class RepositoryWebsiteImpl(
         websiteDao.addWebsite(mapper.entityToDbModel(website))
     }
 
-    override suspend fun deleteWebsite(idWebsite: Int) {
-        websiteDao.deleteWebsite(idWebsite)
+    override suspend fun deleteWebsite(id: Int) {
+        websiteDao.deleteWebsite(id)
     }
 
-    override suspend fun getWebsiteInfo(idWebsite: Int): Website {
-        Log.d("MATAG", "id in rep = $idWebsite")
-        val e = websiteDao.getWebsiteInfo(idWebsite)
-        Log.d("MATAG", "info = ${e.name}")
-        return mapper.dbModelToEntity(websiteDao.getWebsiteInfo(idWebsite))
+    override suspend fun getWebsiteInfo(id: Int): Website {
+        val e = websiteDao.getWebsiteInfo(id)
+        return mapper.dbModelToEntity(websiteDao.getWebsiteInfo(id))
     }
 
     private suspend fun urlToBitmap(url: String): Bitmap {

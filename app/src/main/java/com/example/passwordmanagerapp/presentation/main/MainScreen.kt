@@ -1,6 +1,5 @@
 package com.example.passwordmanagerapp.presentation.main
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,7 +44,7 @@ import com.example.passwordmanagerapp.R
 import com.example.passwordmanagerapp.domain.entities.Website
 
 @Composable
-fun MainScreen(viewModel: MainViewModel, onWebsiteClickListener: (Int) -> Unit) {
+fun MainScreen(viewModel: MainViewModel, onWebsiteClickListener: (Website) -> Unit) {
 
     val screenState = viewModel.screenState.collectAsState(MainScreenState.Initial)
 
@@ -58,10 +57,8 @@ fun MainScreen(viewModel: MainViewModel, onWebsiteClickListener: (Int) -> Unit) 
             )
         }
         is MainScreenState.Initial -> {
-            Log.d("MATAG", "initial")
             InitialScreen(onAddClickListener = onWebsiteClickListener)
         }
-
     }
 }
 
@@ -69,7 +66,7 @@ fun MainScreen(viewModel: MainViewModel, onWebsiteClickListener: (Int) -> Unit) 
 fun MainScreenContent(
     viewModel: MainViewModel,
     list: List<Website>,
-    onWebsiteClickListener: (Int) -> Unit
+    onWebsiteClickListener: (Website) -> Unit
 ) {
     val listState = rememberLazyListState()
     val expandedFab = remember {
@@ -83,7 +80,12 @@ fun MainScreenContent(
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = {
-                    onWebsiteClickListener(-1)
+                    onWebsiteClickListener(
+                        Website(
+                            id = Website.UNDEFINED_ID,
+                            "", "", "", "", "", ""
+                        )
+                    )
                 },
                 expanded = expandedFab.value,
                 icon = { Icon(Icons.Filled.Add, null) },
@@ -115,11 +117,11 @@ fun MainScreenContent(
 @Composable
 fun WebsiteCard(
     website: Website,
-    onWebsiteClickListener: (Int) -> Unit
+    onWebsiteClickListener: (Website) -> Unit
 ) {
     OutlinedCard(
         onClick = {
-            onWebsiteClickListener(website.id)
+            onWebsiteClickListener(website)
         },
         modifier = Modifier
             .fillMaxWidth()
@@ -150,7 +152,7 @@ fun WebsiteCard(
 
 @Composable
 fun InitialScreen(
-    onAddClickListener: (Int) -> Unit
+    onAddClickListener: (Website) -> Unit
 ) {
     val listState = rememberLazyListState()
     val expandedFab = remember {
@@ -164,7 +166,12 @@ fun InitialScreen(
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = {
-                    onAddClickListener(-1)
+                    onAddClickListener(
+                        Website(
+                            id = Website.UNDEFINED_ID,
+                            "", "", "", "", "", ""
+                        )
+                    )
                 },
                 expanded = expandedFab.value,
                 icon = { Icon(Icons.Filled.Add, null) },
@@ -190,5 +197,3 @@ fun InitialScreen(
 
     }
 }
-
-

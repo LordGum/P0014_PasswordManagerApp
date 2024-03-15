@@ -6,9 +6,11 @@ data class Website(
     val iconFileName: String = "image$id",
     var address: String,
     var name: String,
-    val accountList: ArrayList<WebsiteAccount>
+    var cipheredLogin: String,
+    var cipheredPassword: String,
+    var comment: String
 ) {
     companion object {
-        const val UNDEFINED_ID = -1
+        const val UNDEFINED_ID = 0
     }
 }

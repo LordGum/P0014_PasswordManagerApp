@@ -1,23 +1,32 @@
 package com.example.passwordmanagerapp.navigation
 
+import android.net.Uri
+import com.example.passwordmanagerapp.domain.entities.Website
+import com.google.gson.Gson
+
 sealed class Screen(
     val route: String
 ) {
-    object EnterScreen: Screen(ROUTE_ENTER)
-    object MainScreen: Screen(ROUTE_MAIN)
-    object DetailScreen: Screen(ROUTE_DETAIL) {
+    data object EnterScreen: Screen(ROUTE_ENTER)
+    data object MainScreen: Screen(ROUTE_MAIN)
+    data object DetailScreen: Screen(ROUTE_DETAIL) {
         private const val ROUTE_FOR_ARGS = "route_detail"
 
-        fun getArgs(id: Int): String {
-            return "$ROUTE_FOR_ARGS/$id"
+        fun getArgs(website: Website): String {
+            val websiteJson = Gson().toJson(website)
+            return "$ROUTE_FOR_ARGS/${websiteJson.encode()}"
         }
     }
 
     companion object {
-        const val WEBSITE_ID = "id"
+        const val WEBSITE = "id"
 
         const val ROUTE_ENTER = "route_enter"
         const val ROUTE_MAIN = "route_main"
-        const val ROUTE_DETAIL = "route_detail/{$WEBSITE_ID}"
+        const val ROUTE_DETAIL = "route_detail/{$WEBSITE}"
     }
+}
+
+fun String.encode(): String {
+    return Uri.encode(this)
 }
