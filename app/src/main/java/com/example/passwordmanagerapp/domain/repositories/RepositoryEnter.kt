@@ -1,6 +1,6 @@
 package com.example.passwordmanagerapp.domain.repositories
 
-interface RepositoryMain {
+interface RepositoryEnter {
     suspend fun checkMasterPassword(masterPassword: String): Boolean
 
     suspend fun checkFingerPrint(): Boolean

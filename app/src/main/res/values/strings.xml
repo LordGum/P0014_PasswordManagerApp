@@ -17,4 +17,7 @@
     <string name="delete_account">Удалить аккаунт</string>
     <string name="enter_password">Введите пароль</string>
     <string name="delete">Удалить</string>
+    <string name="enter_master_password">Введите мастер пароль</string>
+    <string name="welcome">Добро пожаловать</string>
+    <string name="repeate_password">Повторите пароль</string>
 </resources>

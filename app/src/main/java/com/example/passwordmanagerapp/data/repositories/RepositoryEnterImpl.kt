@@ -1,14 +1,14 @@
 package com.example.passwordmanagerapp.data.repositories
 
 import android.content.Context
-import com.example.passwordmanagerapp.domain.repositories.RepositoryMain
+import com.example.passwordmanagerapp.domain.repositories.RepositoryEnter
 import com.example.passwordmanagerapp.security.CryptoManager
 import javax.inject.Inject
 
-class RepositoryMainImpl @Inject constructor(
+class RepositoryEnterImpl @Inject constructor(
     private val context: Context,
     private val cryptoManager: CryptoManager
-): RepositoryMain {
+): RepositoryEnter {
 
     private val sharedPreferences = context.getSharedPreferences("PasswordManager", Context.MODE_PRIVATE)
 
