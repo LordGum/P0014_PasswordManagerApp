@@ -5,12 +5,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.passwordmanagerapp.domain.entities.Website
 import com.example.passwordmanagerapp.domain.usecases.website.AddWebsiteUseCase
+import com.example.passwordmanagerapp.domain.usecases.website.DeleteWebsiteUseCase
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class DetailViewModel @Inject constructor (
-    private val addWebsiteUseCase: AddWebsiteUseCase
+    private val addWebsiteUseCase: AddWebsiteUseCase,
+    private val deleteWebsiteUseCase: DeleteWebsiteUseCase
 ): ViewModel() {
 
     private val exceptionHandler = CoroutineExceptionHandler { _, _ ->
@@ -32,4 +34,9 @@ class DetailViewModel @Inject constructor (
         return Error.OKAY
     }
 
+    fun deleteWebsite(idWebsite: Int) {
+        viewModelScope.launch(exceptionHandler) {
+            deleteWebsiteUseCase(idWebsite)
+        }
+    }
 }

@@ -12,7 +12,6 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class MainViewModel @Inject constructor(
-    private val deleteWebsiteUseCase :DeleteWebsiteUseCase,
     private val getWebsiteListUseCase: GetWebsitesListUseCase
 ): ViewModel() {
 
@@ -24,11 +23,5 @@ class MainViewModel @Inject constructor(
         .filter { it.isNotEmpty() }
         .map { MainScreenState.WebsiteList(websiteList = it) as MainScreenState }
 
-
-    fun deleteWebsite(idWebsite: Int) {
-        viewModelScope.launch(exceptionHandler) {
-            deleteWebsiteUseCase(idWebsite)
-        }
-    }
 
 }

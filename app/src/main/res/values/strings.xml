@@ -16,4 +16,5 @@
     <string name="name_website">Название</string>
     <string name="delete_account">Удалить аккаунт</string>
     <string name="enter_password">Введите пароль</string>
+    <string name="delete">Удалить</string>
 </resources>

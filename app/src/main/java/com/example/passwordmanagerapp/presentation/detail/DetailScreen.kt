@@ -53,6 +53,7 @@ fun DetailScreen(
     onBackIconClick: () -> Unit
 ) {
         if (website.id != Website.UNDEFINED_ID) {
+            val screenState = DetailScreenState.RefactorState
             val websiteState =  mutableStateOf(WebsiteState(
                 id = website.id,
                 name = website.name,
@@ -108,10 +109,16 @@ fun DetailScreen(
                             else -> {}
                         }
                     }
-                }
+                },
+                onDeleteClick = {
+                    viewModel.deleteWebsite(website.id)
+                    onBackIconClick()
+                },
+                screenState = screenState
             )
         }
         else {
+            val screenState = DetailScreenState.AddState
             val websiteState = rememberSaveable {
                 mutableStateOf(WebsiteState(
                     name = "",
@@ -166,7 +173,9 @@ fun DetailScreen(
                             else -> {}
                         }
                     }
-                }
+                },
+                onDeleteClick = {},
+                screenState = screenState
             )
         }
 }
@@ -182,10 +191,12 @@ fun DetailScreenContent(
     onBackIconClick: () -> Unit,
     onWebsiteStateChange: (WebsiteState) -> Unit,
     onSaveClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+    screenState: DetailScreenState
 ) {
     Scaffold(
         topBar = { TopAppBarDetail(onBackIconClick) },
-        bottomBar = { BottomAppBarDetail(onSaveClick) }
+        bottomBar = { BottomAppBarDetail(onSaveClick, onDeleteClick, screenState) }
     ) {
 
         Column(modifier = Modifier
@@ -443,10 +454,16 @@ private var _visibilityOff: ImageVector? = null
 
 @Composable
 private fun BottomAppBarDetail(
-    onSaveClick: () -> Unit
+    onSaveClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+    screenState: DetailScreenState
 ) {
+    val height =
+        if (screenState is DetailScreenState.RefactorState) 120
+        else 70
+
     BottomAppBar(
-        modifier = Modifier.height(70.dp),
+        modifier = Modifier.height(height.dp),
         actions = {
             Column {
                 Spacer(modifier = Modifier.height(5.dp))
@@ -458,6 +475,19 @@ private fun BottomAppBarDetail(
                 ) {
                     Text(text = stringResource(R.string.save_changes), color = Color.White)
                 }
+
+                if (screenState is DetailScreenState.RefactorState) {
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp),
+                        onClick = { onDeleteClick() }
+                    ) {
+                        Text(text = stringResource(R.string.delete), color = Color.White)
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(40.dp))
             }
         }

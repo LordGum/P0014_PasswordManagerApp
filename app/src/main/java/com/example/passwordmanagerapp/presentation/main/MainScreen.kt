@@ -51,7 +51,6 @@ fun MainScreen(viewModel: MainViewModel, onWebsiteClickListener: (Website) -> Un
     when (val currentState = screenState.value) {
         is MainScreenState.WebsiteList -> {
             MainScreenContent(
-                viewModel =viewModel,
                 list = currentState.websiteList,
                 onWebsiteClickListener = onWebsiteClickListener
             )
@@ -64,7 +63,6 @@ fun MainScreen(viewModel: MainViewModel, onWebsiteClickListener: (Website) -> Un
 
 @Composable
 fun MainScreenContent(
-    viewModel: MainViewModel,
     list: List<Website>,
     onWebsiteClickListener: (Website) -> Unit
 ) {
