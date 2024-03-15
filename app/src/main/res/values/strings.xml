@@ -20,4 +20,8 @@
     <string name="enter_master_password">Введите мастер пароль</string>
     <string name="welcome">Добро пожаловать</string>
     <string name="repeate_password">Повторите пароль</string>
+    <string name="add_enter_by_finger_print">Добавить вход по отпечатку пальца ?</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="check">Проверить</string>
 </resources>

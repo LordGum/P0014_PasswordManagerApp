@@ -6,5 +6,5 @@ import androidx.compose.runtime.Composable
 fun EnterScreen(
     onClickListener: () -> Unit
 ) {
-   WelcomePasswordScreen()
+    UsualEnterScreen()
 }
