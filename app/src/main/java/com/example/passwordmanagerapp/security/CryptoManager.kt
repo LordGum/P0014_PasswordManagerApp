@@ -1,8 +1,9 @@
 package com.example.passwordmanagerapp.security
 
+import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
-import android.security.keystore.KeyProtection
 import android.util.Base64
+import android.util.Log
 import java.nio.charset.StandardCharsets
 import java.security.KeyStore
 import java.util.Calendar
@@ -10,66 +11,61 @@ import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
+import javax.inject.Inject
 
-class CryptoManager {
-    init {
-        createKey()
+class CryptoManager @Inject constructor() {
+
+
+    private val keyStore = KeyStore.getInstance("AndroidKeyStore").apply {
+        load(null)
     }
 
-    private fun createKey() {
-        val keyStore = KeyStore.getInstance("AndroidKeyStore").apply {
-            load(null)
-        }
+    private fun getKey(): SecretKey {
+        Log.d("MATAG", "вызываем getKey()")
+        val existingKey = keyStore.getEntry(ALIAS, null) as? KeyStore.SecretKeyEntry
+        return existingKey?.secretKey ?: createKey()
+    }
 
-        val keyGen = KeyGenerator.getInstance(ALGORITHM)
-        keyGen.init(256)
-
-        val secretKey: SecretKey = keyGen.generateKey()
+    private fun createKey(): SecretKey {
+        Log.d("MATAG", "вызываем create()")
 
         val start: Calendar = Calendar.getInstance()
         val end: Calendar = Calendar.getInstance()
         end.add(Calendar.YEAR, 2)
 
-        val entry = KeyStore.SecretKeyEntry(secretKey)
-        val protectionParameter =
-            KeyProtection.Builder(KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
-                .setKeyValidityStart(start.time)
-                .setKeyValidityEnd(end.time)
-                .setBlockModes(BLOCK_MODE)
-                .setEncryptionPaddings(PADDING)
-                .build()
-
-        keyStore.setEntry(ALIAS, entry, protectionParameter)
+        return KeyGenerator.getInstance(ALGORITHM).apply {
+            init(
+                KeyGenParameterSpec.Builder(
+                    ALIAS,
+                    KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+                )
+                    .setKeyValidityStart(start.time)
+                    .setKeyValidityEnd(end.time)
+                    .setBlockModes(BLOCK_MODE)
+                    .setEncryptionPaddings(PADDING)
+                    .build()
+            )
+        }.generateKey()
     }
+
 
     fun encrypt(plainText: String): String? {
 
-        val keyStore = KeyStore.getInstance(ANDROID_STORE).apply {
-            load(null)
-        }
-
-        val secretKey = keyStore.getKey(ALIAS, null)
-
         return try {
             val cipher = Cipher.getInstance(TRANSFORMATION)
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey)
+            cipher.init(Cipher.ENCRYPT_MODE, getKey())
 
             val cipherText = Base64.encodeToString(cipher.doFinal(plainText.toByteArray()), Base64.DEFAULT)
             val iv = Base64.encodeToString(cipher.iv, Base64.DEFAULT)
 
             "${cipherText}.$iv"
         } catch (e: Exception) {
-            throw RuntimeException("encrypt: error msg = ${e.message}")
+            Log.e("MATAG", "encrypt: error msg = ${e.message}")
+            null
         }
     }
 
-    fun decrypt(cipherText: String): String? {
-
-        val keyStore = KeyStore.getInstance(ANDROID_STORE).apply {
-            load(null)
-        }
-
-        val secretKey = keyStore.getKey(ALIAS, null)
+    fun decrypt( cipherText: String): String? {
 
         val array = cipherText.split(".")
         val cipherData = Base64.decode(array[0], Base64.DEFAULT)
@@ -79,18 +75,18 @@ class CryptoManager {
             val cipher = Cipher.getInstance(TRANSFORMATION)
             val spec = IvParameterSpec(iv)
 
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, spec)
+            cipher.init(Cipher.DECRYPT_MODE, getKey(), spec)
 
             val clearText = cipher.doFinal(cipherData)
 
             String(clearText, 0, clearText.size, StandardCharsets.UTF_8)
         } catch (e: Exception) {
-            throw RuntimeException("decrypt: error msg = ${e.message}")
+            Log.e("MATAG", "decrypt: error msg = ${e.message}")
+            null
         }
     }
 
     companion object {
-        private const val ANDROID_STORE = "AndroidKeyStore"
         private const val ALIAS = "alias"
         private const val ALGORITHM = KeyProperties.KEY_ALGORITHM_AES
         private const val BLOCK_MODE = KeyProperties.BLOCK_MODE_CBC

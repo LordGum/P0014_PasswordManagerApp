@@ -1,4 +1,4 @@
-package com.example.passwordmanagerapp.presentation.enter
+package com.example.passwordmanagerapp.presentation
 
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
@@ -9,24 +9,35 @@ import com.example.passwordmanagerapp.navigation.Screen
 import com.example.passwordmanagerapp.navigation.rememberNavigationState
 import com.example.passwordmanagerapp.presentation.detail.DetailScreen
 import com.example.passwordmanagerapp.presentation.detail.DetailViewModel
+import com.example.passwordmanagerapp.presentation.enter.EnterScreen
+import com.example.passwordmanagerapp.presentation.enter.EnterViewModel
 import com.example.passwordmanagerapp.presentation.main.MainScreen
 import com.example.passwordmanagerapp.presentation.main.MainViewModel
 
 @Composable
 fun BaseScreen() {
     val navigationState = rememberNavigationState()
+    val component = getApplicationComponent()
 
     AppNavGraph(
         navHostController = navigationState.navHostController,
         enterScreenContent = {
+            val viewModel: EnterViewModel = ViewModelProvider(
+                LocalContext.current as ComponentActivity,
+                component.getViewModelFactory()
+            )[EnterViewModel::class.java]
             EnterScreen(
                 onClickListener = {
                     navigationState.navigateTo(Screen.MainScreen.route)
-                }
+                },
+                viewModel
             )
         },
         mainScreenContent = {
-            val viewModel: MainViewModel = ViewModelProvider(LocalContext.current as ComponentActivity)[MainViewModel::class.java]
+            val viewModel: MainViewModel = ViewModelProvider(
+                LocalContext.current as ComponentActivity,
+                component.getViewModelFactory()
+            )[MainViewModel::class.java]
             MainScreen(
                 viewModel,
                 onWebsiteClickListener = {
@@ -35,7 +46,10 @@ fun BaseScreen() {
             )
         },
         detailScreenContent = { website ->
-            val viewModel: DetailViewModel = ViewModelProvider(LocalContext.current as ComponentActivity)[DetailViewModel::class.java]
+            val viewModel: DetailViewModel = ViewModelProvider(
+                LocalContext.current as ComponentActivity,
+                component.getViewModelFactory()
+            )[DetailViewModel::class.java]
             DetailScreen(
                 viewModel,
                 website,

@@ -1,9 +1,11 @@
 package com.example.passwordmanagerapp.domain.repositories
 
 interface RepositoryEnter {
-    suspend fun checkMasterPassword(masterPassword: String): Boolean
+    fun checkMasterPassword(masterPassword: String): Boolean
 
-    suspend fun checkFingerPrint(): Boolean
+    fun checkFingerPrint(): Boolean
 
-    suspend fun resetMasterPassword(masterPassword: String)
+    fun resetMasterPassword(masterPassword: String)
+
+    fun checkIsMasterPasswordNull(): Boolean
 }

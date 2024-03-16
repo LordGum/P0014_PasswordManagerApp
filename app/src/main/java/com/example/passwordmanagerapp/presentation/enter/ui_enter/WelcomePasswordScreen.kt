@@ -1,4 +1,4 @@
-package com.example.passwordmanagerapp.presentation.enter
+package com.example.passwordmanagerapp.presentation.enter.ui_enter
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,7 +33,9 @@ import com.example.passwordmanagerapp.R
 
 
 @Composable
-fun WelcomePasswordScreen() {
+fun WelcomePasswordScreen(
+    onSaveClick: (String) -> Unit
+) {
     val pass1 = rememberSaveable { mutableStateOf("") }
     val pass2 = rememberSaveable { mutableStateOf("") }
     val errorPassword1 = rememberSaveable { mutableStateOf(false) }
@@ -58,7 +60,7 @@ fun WelcomePasswordScreen() {
             pass2.value = it
         },
         onSaveClick = {
-            //TODO
+            onSaveClick(pass1.value)
         },
         isEnableSaveButton = enableButton
     )

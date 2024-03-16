@@ -6,5 +6,5 @@ import javax.inject.Inject
 class CheckFingerPrintUseCase @Inject constructor(
     private val repositoryMain: RepositoryEnter
 ) {
-    suspend operator fun invoke() = repositoryMain.checkFingerPrint()
+    operator fun invoke() = repositoryMain.checkFingerPrint()
 }

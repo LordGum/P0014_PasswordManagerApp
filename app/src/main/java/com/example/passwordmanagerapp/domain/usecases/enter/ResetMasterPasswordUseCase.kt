@@ -6,5 +6,5 @@ import javax.inject.Inject
 class ResetMasterPasswordUseCase @Inject constructor(
     private val repositoryMain: RepositoryEnter
 ) {
-    suspend operator fun invoke(masterPassword: String) = repositoryMain.resetMasterPassword(masterPassword)
+    operator fun invoke(masterPassword: String) = repositoryMain.resetMasterPassword(masterPassword)
 }

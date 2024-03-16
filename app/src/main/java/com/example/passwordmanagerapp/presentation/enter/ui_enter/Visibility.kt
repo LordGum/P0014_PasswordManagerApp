@@ -1,4 +1,4 @@
-package com.example.passwordmanagerapp.presentation.enter
+package com.example.passwordmanagerapp.presentation.enter.ui_enter
 
 import androidx.compose.material.icons.materialIcon
 import androidx.compose.material.icons.materialPath

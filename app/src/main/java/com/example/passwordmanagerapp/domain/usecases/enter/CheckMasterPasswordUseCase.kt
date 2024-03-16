@@ -6,5 +6,5 @@ import javax.inject.Inject
 class CheckMasterPasswordUseCase @Inject constructor(
     private val repositoryMain: RepositoryEnter
 ) {
-    suspend operator fun invoke(masterPassword: String) = repositoryMain.checkMasterPassword(masterPassword)
+    operator fun invoke(masterPassword: String) = repositoryMain.checkMasterPassword(masterPassword)
 }

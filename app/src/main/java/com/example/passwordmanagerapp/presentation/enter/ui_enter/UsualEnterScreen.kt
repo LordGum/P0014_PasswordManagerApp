@@ -1,4 +1,4 @@
-package com.example.passwordmanagerapp.presentation.enter
+package com.example.passwordmanagerapp.presentation.enter.ui_enter
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,7 +11,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,6 +32,7 @@ import com.example.passwordmanagerapp.R
 
 @Composable
 fun UsualEnterScreen(
+    modifier: Modifier,
     isFingerPrintEnable: Boolean,
     checkPassword: (String) -> Unit
 ) {

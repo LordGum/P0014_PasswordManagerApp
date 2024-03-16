@@ -25,4 +25,5 @@
     <string name="no">Нет</string>
     <string name="check">Проверить</string>
     <string name="touch_sensor">Коснитесь сенсора</string>
+    <string name="incorrect_password">Введен неверный пароль</string>
 </resources>

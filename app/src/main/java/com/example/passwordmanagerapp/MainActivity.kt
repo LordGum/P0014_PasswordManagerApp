@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.passwordmanagerapp.presentation.AppApplication
 import com.example.passwordmanagerapp.presentation.ViewModelFactory
 import com.example.passwordmanagerapp.presentation.detail.DetailViewModel
-import com.example.passwordmanagerapp.presentation.enter.BaseScreen
+import com.example.passwordmanagerapp.presentation.BaseScreen
 import com.example.passwordmanagerapp.presentation.main.MainViewModel
 import com.example.passwordmanagerapp.ui.theme.PasswordManagerAppTheme
 import javax.inject.Inject
