@@ -21,13 +21,11 @@ class CryptoManager @Inject constructor() {
     }
 
     private fun getKey(): SecretKey {
-        Log.d("MATAG", "вызываем getKey()")
         val existingKey = keyStore.getEntry(ALIAS, null) as? KeyStore.SecretKeyEntry
         return existingKey?.secretKey ?: createKey()
     }
 
     private fun createKey(): SecretKey {
-        Log.d("MATAG", "вызываем create()")
 
         val start: Calendar = Calendar.getInstance()
         val end: Calendar = Calendar.getInstance()

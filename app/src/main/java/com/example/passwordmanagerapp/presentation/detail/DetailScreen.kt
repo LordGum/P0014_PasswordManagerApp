@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import com.example.passwordmanagerapp.R
 import com.example.passwordmanagerapp.domain.entities.Website
 import com.example.passwordmanagerapp.presentation.detail.entities_states.WebsiteState
+import com.example.passwordmanagerapp.security.CryptoManager
 
 @Composable
 fun DetailScreen(
@@ -52,14 +53,16 @@ fun DetailScreen(
     website: Website,
     onBackIconClick: () -> Unit
 ) {
+    val cryptoManager = CryptoManager()
+
         if (website.id != Website.UNDEFINED_ID) {
             val screenState = DetailScreenState.RefactorState
             val websiteState =  mutableStateOf(WebsiteState(
                 id = website.id,
                 name = website.name,
                 address = website.address,
-                cipheredLogin = website.cipheredLogin,
-                cipheredPassword = website.cipheredPassword,
+                cipheredLogin = cryptoManager.decrypt(website.cipheredLogin) ?: throw RuntimeException("login is null"),
+                cipheredPassword = cryptoManager.decrypt(website.cipheredPassword)  ?: throw RuntimeException("password is null"),
                 comment = website.comment
             ))
             val errorStateName = rememberSaveable { mutableStateOf(false) }

@@ -17,10 +17,8 @@ class RepositoryEnterImpl @Inject constructor(
     override fun checkMasterPassword(masterPassword: String): Boolean {
         val cipheredMasterPassport = sharedPreferences.getString(CIPHERED_MASTER_PASSWORD, null)
         cipheredMasterPassport?.let {
-            Log.d("MATAG", "cipheredMasterPassport = ${it}")
             val password =
                 cryptoManager.decrypt(it) ?: throw RuntimeException("masterPassword is null")
-            Log.d("MATAG", "result = ${(masterPassword == password)}")
             return (masterPassword == password)
         }
         return false
@@ -31,9 +29,7 @@ class RepositoryEnterImpl @Inject constructor(
     }
 
     override fun resetMasterPassword(masterPassword: String) {
-        Log.d("MATAG", " До шифровки $masterPassword")
         val cipheredMasterPassword = cryptoManager.encrypt(masterPassword)
-        Log.d("MATAG", " После шифровки $cipheredMasterPassword")
         val editor = sharedPreferences.edit()
         editor.putString(CIPHERED_MASTER_PASSWORD, cipheredMasterPassword)
         editor.apply()
