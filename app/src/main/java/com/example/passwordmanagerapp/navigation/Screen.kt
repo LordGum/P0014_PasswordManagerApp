@@ -17,13 +17,16 @@ sealed class Screen(
             return "$ROUTE_FOR_ARGS/${websiteJson.encode()}"
         }
     }
+    data object FingerPrintScreen: Screen(ROUTE_FINGER_PRINT)
+
 
     companion object {
         const val WEBSITE = "id"
 
-        const val ROUTE_ENTER = "route_enter"
-        const val ROUTE_MAIN = "route_main"
-        const val ROUTE_DETAIL = "route_detail/{$WEBSITE}"
+        private const val ROUTE_ENTER = "route_enter"
+        private const val ROUTE_MAIN = "route_main"
+        private const val ROUTE_DETAIL = "route_detail/{$WEBSITE}"
+        private const val ROUTE_FINGER_PRINT = "route_finger_print"
     }
 }
 

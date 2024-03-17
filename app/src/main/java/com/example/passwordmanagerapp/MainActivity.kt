@@ -1,22 +1,15 @@
 package com.example.passwordmanagerapp
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.FragmentActivity
 import com.example.passwordmanagerapp.presentation.AppApplication
-import com.example.passwordmanagerapp.presentation.ViewModelFactory
-import com.example.passwordmanagerapp.presentation.detail.DetailViewModel
 import com.example.passwordmanagerapp.presentation.BaseScreen
-import com.example.passwordmanagerapp.presentation.main.MainViewModel
+import com.example.passwordmanagerapp.presentation.ViewModelFactory
 import com.example.passwordmanagerapp.ui.theme.PasswordManagerAppTheme
 import javax.inject.Inject
 
-class MainActivity : ComponentActivity() {
-
-    private lateinit var mainViewModel: MainViewModel
-    private lateinit var detailViewModel: DetailViewModel
+class MainActivity : FragmentActivity() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -32,8 +25,6 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             PasswordManagerAppTheme {
-                mainViewModel = ViewModelProvider(LocalContext.current as ComponentActivity, viewModelFactory)[MainViewModel::class.java]
-                detailViewModel = ViewModelProvider(LocalContext.current as ComponentActivity, viewModelFactory)[DetailViewModel::class.java]
                 BaseScreen()
             }
         }
@@ -49,5 +40,6 @@ class MainActivity : ComponentActivity() {
 //            } else throw RuntimeException("file fail")
 //        }
 //    }
+
 
 }

@@ -11,6 +11,7 @@ import com.example.passwordmanagerapp.presentation.detail.DetailScreen
 import com.example.passwordmanagerapp.presentation.detail.DetailViewModel
 import com.example.passwordmanagerapp.presentation.enter.EnterScreen
 import com.example.passwordmanagerapp.presentation.enter.EnterViewModel
+import com.example.passwordmanagerapp.presentation.enter.ui_enter.WelcomeFingerPrintScreen
 import com.example.passwordmanagerapp.presentation.main.MainScreen
 import com.example.passwordmanagerapp.presentation.main.MainViewModel
 
@@ -27,6 +28,9 @@ fun BaseScreen() {
                 component.getViewModelFactory()
             )[EnterViewModel::class.java]
             EnterScreen(
+                onAddFingerPrint = {
+                    navigationState.navigateTo(Screen.FingerPrintScreen.route)
+                },
                 onClickListener = {
                     navigationState.navigateTo(Screen.MainScreen.route)
                 },
@@ -55,6 +59,16 @@ fun BaseScreen() {
                 website,
                 onBackIconClick = {
                     navigationState.navHostController.popBackStack()
+                }
+            )
+        },
+        fingerScreenContent = {
+            WelcomeFingerPrintScreen (
+                onNoClick = {
+                    navigationState.navigateTo(Screen.MainScreen.route)
+                },
+                onSuccess = {
+                    navigationState.navigateTo(Screen.MainScreen.route)
                 }
             )
         }

@@ -16,11 +16,11 @@ fun AppNavGraph(
     enterScreenContent: @Composable () -> Unit,
     mainScreenContent: @Composable () -> Unit,
     detailScreenContent: @Composable (Website) -> Unit,
-
+    fingerScreenContent: @Composable () -> Unit
     ) {
     NavHost(
         navController = navHostController,
-        startDestination = Screen.EnterScreen.route  //TODO(поменять на EnterScreen)
+        startDestination = Screen.EnterScreen.route
     ) {
         composable(Screen.EnterScreen.route) {
             enterScreenContent()
@@ -39,6 +39,10 @@ fun AppNavGraph(
             val websiteJson = it.arguments?.getString(Screen.WEBSITE) ?: ""
             val website = Gson().fromJson(websiteJson, Website::class.java)
             detailScreenContent(website)
+        }
+
+        composable(Screen.FingerPrintScreen.route) {
+            fingerScreenContent()
         }
     }
 }

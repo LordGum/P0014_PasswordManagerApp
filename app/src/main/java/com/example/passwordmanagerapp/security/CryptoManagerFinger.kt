@@ -2,22 +2,23 @@ package com.example.passwordmanagerapp.security
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
-import android.util.Base64
-import android.util.Log
-import java.nio.charset.StandardCharsets
+import androidx.biometric.BiometricPrompt
+import androidx.biometric.BiometricPrompt.PromptInfo
 import java.security.KeyStore
 import java.util.Calendar
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
-import javax.crypto.spec.IvParameterSpec
 import javax.inject.Inject
 
-class CryptoManager @Inject constructor() {
-
+class CryptoManagerFinger @Inject constructor() {
 
     private val keyStore = KeyStore.getInstance("AndroidKeyStore").apply {
         load(null)
+    }
+
+    private fun getCipher(): Cipher {
+        return Cipher.getInstance(TRANSFORMATION)
     }
 
     private fun getKey(): SecretKey {
@@ -38,53 +39,30 @@ class CryptoManager @Inject constructor() {
                 )
                     .setKeyValidityStart(start.time)
                     .setKeyValidityEnd(end.time)
-                    .setBlockModes(BLOCK_MODE)
-                    .setEncryptionPaddings(PADDING)
+                    .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
+                    .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
+                    .setUserAuthenticationRequired(true)
+                    .setInvalidatedByBiometricEnrollment(true)
                     .build()
             )
         }.generateKey()
     }
 
-
-    fun encrypt(plainText: String): String? {
-
-        return try {
-            val cipher = Cipher.getInstance(TRANSFORMATION)
-            cipher.init(Cipher.ENCRYPT_MODE, getKey())
-
-            val cipherText = Base64.encodeToString(cipher.doFinal(plainText.toByteArray()), Base64.DEFAULT)
-            val iv = Base64.encodeToString(cipher.iv, Base64.DEFAULT)
-
-            "${cipherText}.$iv"
-        } catch (e: Exception) {
-            Log.e("MATAG", "encrypt: error msg = ${e.message}")
-            null
-        }
+    fun encryptFinger(biometricPrompt: BiometricPrompt, promptInfo: PromptInfo) {
+        val cipher = getCipher()
+        val secretKey = getKey()
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey)
+        biometricPrompt.authenticate(promptInfo,
+            BiometricPrompt.CryptoObject(cipher))
     }
 
-    fun decrypt( cipherText: String): String? {
 
-        val array = cipherText.split(".")
-        val cipherData = Base64.decode(array[0], Base64.DEFAULT)
-        val iv = Base64.decode(array[1], Base64.DEFAULT)
 
-        return try {
-            val cipher = Cipher.getInstance(TRANSFORMATION)
-            val spec = IvParameterSpec(iv)
 
-            cipher.init(Cipher.DECRYPT_MODE, getKey(), spec)
-
-            val clearText = cipher.doFinal(cipherData)
-
-            String(clearText, 0, clearText.size, StandardCharsets.UTF_8)
-        } catch (e: Exception) {
-            Log.e("MATAG", "decrypt: error msg = ${e.message}")
-            null
-        }
-    }
 
     companion object {
-        private const val ALIAS = "alias"
+        private const val ALIAS = "alias_for_print"
+
         private const val ALGORITHM = KeyProperties.KEY_ALGORITHM_AES
         private const val BLOCK_MODE = KeyProperties.BLOCK_MODE_CBC
         private const val PADDING = KeyProperties.ENCRYPTION_PADDING_PKCS7

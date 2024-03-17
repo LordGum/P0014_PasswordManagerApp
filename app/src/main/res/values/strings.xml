@@ -26,4 +26,8 @@
     <string name="check">Проверить</string>
     <string name="touch_sensor">Коснитесь сенсора</string>
     <string name="incorrect_password">Введен неверный пароль</string>
+    <string name="cancel">Отмена</string>
+    <string name="enter_string1">Войти по отпечатку пальца</string>
+    <string name="enter_string2">Приложите палец к сканеру</string>
+    <string name="enter_with_password">Войти по паролю</string>
 </resources>

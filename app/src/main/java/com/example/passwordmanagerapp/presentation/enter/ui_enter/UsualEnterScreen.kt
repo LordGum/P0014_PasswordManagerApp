@@ -19,7 +19,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -33,7 +32,6 @@ import com.example.passwordmanagerapp.R
 @Composable
 fun UsualEnterScreen(
     modifier: Modifier,
-    isFingerPrintEnable: Boolean,
     checkPassword: (String) -> Unit
 ) {
     val password = rememberSaveable { mutableStateOf("") }
@@ -62,14 +60,6 @@ fun UsualEnterScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = stringResource(R.string.check), color = Color.White)
-        }
-        Spacer(modifier = Modifier.height(18.dp))
-        if (isFingerPrintEnable) {
-            Text(
-                text = stringResource(R.string.touch_sensor),
-                color = Color(0xFF625b71),
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
         }
     }
 }
