@@ -1,5 +1,6 @@
 package com.example.passwordmanagerapp.presentation.main
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,18 +31,26 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.ColorPainter
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.passwordmanagerapp.R
 import com.example.passwordmanagerapp.domain.entities.Website
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun MainScreen(viewModel: MainViewModel, onWebsiteClickListener: (Website) -> Unit) {
@@ -52,7 +61,8 @@ fun MainScreen(viewModel: MainViewModel, onWebsiteClickListener: (Website) -> Un
         is MainScreenState.WebsiteList -> {
             MainScreenContent(
                 list = currentState.websiteList,
-                onWebsiteClickListener = onWebsiteClickListener
+                onWebsiteClickListener = onWebsiteClickListener,
+                viewModel
             )
         }
         is MainScreenState.Initial -> {
@@ -64,7 +74,8 @@ fun MainScreen(viewModel: MainViewModel, onWebsiteClickListener: (Website) -> Un
 @Composable
 fun MainScreenContent(
     list: List<Website>,
-    onWebsiteClickListener: (Website) -> Unit
+    onWebsiteClickListener: (Website) -> Unit,
+    viewModel: MainViewModel
 ) {
     val listState = rememberLazyListState()
     val expandedFab = remember {
@@ -93,6 +104,7 @@ fun MainScreenContent(
         floatingActionButtonPosition = FabPosition.End,
     ) {paddingValues ->
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
@@ -105,17 +117,21 @@ fun MainScreenContent(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(items = list, key = { it.id }) { item ->
-                WebsiteCard(item, onWebsiteClickListener)
+                val bitmap = remember { mutableStateOf<Bitmap?>(null) }
+                CoroutineScope(Dispatchers.Main).launch {
+                    bitmap.value = viewModel.getBitMap(item.iconFileName).await()
+                }
+                WebsiteCard(item, onWebsiteClickListener, bitmap.value)
             }
         }
     }
 }
 
-
 @Composable
 fun WebsiteCard(
     website: Website,
-    onWebsiteClickListener: (Website) -> Unit
+    onWebsiteClickListener: (Website) -> Unit,
+    bitmap: Bitmap?
 ) {
     OutlinedCard(
         onClick = {
@@ -130,17 +146,30 @@ fun WebsiteCard(
             contentColor = MaterialTheme.colorScheme.primary
         )
     ) {
+        Spacer(modifier = Modifier.height(8.dp))
         Row (
             verticalAlignment = Alignment.CenterVertically
         ){
-            Image(
-                modifier = Modifier
-                    .padding(10.dp)
-                    .size(50.dp)
-                    .clip(CircleShape),
-                painter = ColorPainter(Color.Magenta),
-                contentDescription = null
-            )
+            bitmap?.let {
+                Image(
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .size(36.dp)
+                        .clip(CircleShape),
+                    bitmap = bitmap.asImageBitmap() ,
+                    contentDescription = null
+                )
+            }
+            if(bitmap == null){
+                Image(
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .size(36.dp)
+                        .clip(CircleShape),
+                    painter = painterResource(id = R.drawable.ic_net),
+                    contentDescription = null
+                )
+            }
             Spacer(modifier = Modifier.width(8.dp))
             Text(fontSize = 20.sp, text = website.name)
         }

@@ -55,132 +55,132 @@ fun DetailScreen(
 ) {
     val cryptoManager = CryptoManager()
 
-        if (website.id != Website.UNDEFINED_ID) {
-            val screenState = DetailScreenState.RefactorState
-            val websiteState =  mutableStateOf(WebsiteState(
-                id = website.id,
-                name = website.name,
-                address = website.address,
-                cipheredLogin = cryptoManager.decrypt(website.cipheredLogin) ?: throw RuntimeException("login is null"),
-                cipheredPassword = cryptoManager.decrypt(website.cipheredPassword)  ?: throw RuntimeException("password is null"),
-                comment = website.comment
-            ))
-            val errorStateName = rememberSaveable { mutableStateOf(false) }
-            val errorStateAddress = rememberSaveable { mutableStateOf(false) }
-            val errorStateLogin = rememberSaveable { mutableStateOf(false) }
-            val errorStatePassword = rememberSaveable { mutableStateOf(false) }
+    if (website.id != Website.UNDEFINED_ID) {
+        val screenState = DetailScreenState.RefactorState
+        val websiteState =  mutableStateOf(WebsiteState(
+            id = website.id,
+            name = website.name,
+            address = website.address,
+            cipheredLogin = cryptoManager.decrypt(website.cipheredLogin) ?: throw RuntimeException("login is null"),
+            cipheredPassword = cryptoManager.decrypt(website.cipheredPassword)  ?: throw RuntimeException("password is null"),
+            comment = website.comment
+        ))
+        val errorStateName = rememberSaveable { mutableStateOf(false) }
+        val errorStateAddress = rememberSaveable { mutableStateOf(false) }
+        val errorStateLogin = rememberSaveable { mutableStateOf(false) }
+        val errorStatePassword = rememberSaveable { mutableStateOf(false) }
 
-            DetailScreenContent(
-                errorListener = {error, boolean ->
-                    when(error) {
-                        Error.NAME -> errorStateName.value = boolean
-                        Error.ADDRESS -> errorStateAddress.value = boolean
-                        Error.LOGIN -> errorStateLogin.value = boolean
-                        Error.PASSWORD -> errorStatePassword.value = boolean
-                        Error.OKAY -> {}
-                    }
-                },
-                errorStateName = errorStateName,
-                errorStateAddress = errorStateAddress,
-                errorStateLogin = errorStateLogin,
-                errorStatePassword = errorStatePassword,
-                website = websiteState,
-                onBackIconClick = onBackIconClick,
+        DetailScreenContent(
+            errorListener = {error, boolean ->
+                when(error) {
+                    Error.NAME -> errorStateName.value = boolean
+                    Error.ADDRESS -> errorStateAddress.value = boolean
+                    Error.LOGIN -> errorStateLogin.value = boolean
+                    Error.PASSWORD -> errorStatePassword.value = boolean
+                    Error.OKAY -> {}
+                }
+            },
+            errorStateName = errorStateName,
+            errorStateAddress = errorStateAddress,
+            errorStateLogin = errorStateLogin,
+            errorStatePassword = errorStatePassword,
+            website = websiteState,
+            onBackIconClick = onBackIconClick,
 
-                onWebsiteStateChange = {
-                    websiteState.value = it
-                },
-                onSaveClick = {
-                    val websiteEntity = Website(
-                        id = websiteState.value.id,
-                        name = websiteState.value.name,
-                        address = websiteState.value.address,
-                        cipheredLogin = websiteState.value.cipheredLogin,
-                        cipheredPassword = websiteState.value.cipheredPassword,
-                        comment = websiteState.value.comment
-                    )
-                    val parseError = viewModel.parseWebsite(websiteEntity)
-                    if (parseError == Error.OKAY) {
-                        viewModel.addWebsite(websiteEntity)
-                        onBackIconClick()
-                    } else {
-                        when(parseError) {
-                            Error.NAME -> errorStateName.value = true
-                            Error.ADDRESS -> errorStateAddress.value = true
-                            Error.LOGIN -> errorStateLogin.value = true
-                            Error.PASSWORD -> errorStatePassword.value = true
-                            else -> {}
-                        }
-                    }
-                },
-                onDeleteClick = {
-                    viewModel.deleteWebsite(website.id)
+            onWebsiteStateChange = {
+                websiteState.value = it
+            },
+            onSaveClick = {
+                val websiteEntity = Website(
+                    id = websiteState.value.id,
+                    name = websiteState.value.name,
+                    address = websiteState.value.address,
+                    cipheredLogin = websiteState.value.cipheredLogin,
+                    cipheredPassword = websiteState.value.cipheredPassword,
+                    comment = websiteState.value.comment
+                )
+                val parseError = viewModel.parseWebsite(websiteEntity)
+                if (parseError == Error.OKAY) {
+                    viewModel.addWebsite(websiteEntity)
                     onBackIconClick()
-                },
-                screenState = screenState
-            )
+                } else {
+                    when(parseError) {
+                        Error.NAME -> errorStateName.value = true
+                        Error.ADDRESS -> errorStateAddress.value = true
+                        Error.LOGIN -> errorStateLogin.value = true
+                        Error.PASSWORD -> errorStatePassword.value = true
+                        else -> {}
+                    }
+                }
+            },
+            onDeleteClick = {
+                viewModel.deleteWebsite(website.id)
+                onBackIconClick()
+            },
+            screenState = screenState
+        )
+    }
+    else {
+        val screenState = DetailScreenState.AddState
+        val websiteState = rememberSaveable {
+            mutableStateOf(WebsiteState(
+                name = "",
+                address = "",
+                cipheredLogin = "",
+                cipheredPassword = "",
+                comment = ""
+            ))
         }
-        else {
-            val screenState = DetailScreenState.AddState
-            val websiteState = rememberSaveable {
-                mutableStateOf(WebsiteState(
-                    name = "",
-                    address = "",
-                    cipheredLogin = "",
-                    cipheredPassword = "",
-                    comment = ""
-                ))
-            }
-            val errorStateName = rememberSaveable { mutableStateOf(false) }
-            val errorStateAddress = rememberSaveable { mutableStateOf(false) }
-            val errorStateLogin = rememberSaveable { mutableStateOf(false) }
-            val errorStatePassword = rememberSaveable { mutableStateOf(false) }
+        val errorStateName = rememberSaveable { mutableStateOf(false) }
+        val errorStateAddress = rememberSaveable { mutableStateOf(false) }
+        val errorStateLogin = rememberSaveable { mutableStateOf(false) }
+        val errorStatePassword = rememberSaveable { mutableStateOf(false) }
 
-            DetailScreenContent(
-                errorListener = {error, boolean ->
-                    when(error) {
-                        Error.NAME -> errorStateName.value = boolean
-                        Error.ADDRESS -> errorStateAddress.value = boolean
-                        Error.LOGIN -> errorStateLogin.value = boolean
-                        Error.PASSWORD -> errorStatePassword.value = boolean
-                        Error.OKAY -> {}
+        DetailScreenContent(
+            errorListener = {error, boolean ->
+                when(error) {
+                    Error.NAME -> errorStateName.value = boolean
+                    Error.ADDRESS -> errorStateAddress.value = boolean
+                    Error.LOGIN -> errorStateLogin.value = boolean
+                    Error.PASSWORD -> errorStatePassword.value = boolean
+                    Error.OKAY -> {}
+                }
+            },
+            errorStateName = errorStateName,
+            errorStateAddress = errorStateAddress,
+            errorStateLogin = errorStateLogin,
+            errorStatePassword = errorStatePassword,
+            website = websiteState,
+            onBackIconClick = onBackIconClick,
+            onWebsiteStateChange = {
+                websiteState.value = it
+            },
+            onSaveClick = {
+                val websiteEntity = Website(
+                    name = websiteState.value.name,
+                    address = websiteState.value.address,
+                    cipheredLogin = websiteState.value.cipheredLogin,
+                    cipheredPassword = websiteState.value.cipheredPassword,
+                    comment = websiteState.value.comment
+                )
+                val parseError = viewModel.parseWebsite(websiteEntity)
+                if (parseError == Error.OKAY) {
+                    viewModel.addWebsite(websiteEntity)
+                    onBackIconClick()
+                } else {
+                    when(parseError) {
+                        Error.NAME -> errorStateName.value = true
+                        Error.ADDRESS -> errorStateAddress.value = true
+                        Error.LOGIN -> errorStateLogin.value = true
+                        Error.PASSWORD -> errorStatePassword.value = true
+                        else -> {}
                     }
-                },
-                errorStateName = errorStateName,
-                errorStateAddress = errorStateAddress,
-                errorStateLogin = errorStateLogin,
-                errorStatePassword = errorStatePassword,
-                website = websiteState,
-                onBackIconClick = onBackIconClick,
-                onWebsiteStateChange = {
-                    websiteState.value = it
-                },
-                onSaveClick = {
-                    val websiteEntity = Website(
-                        name = websiteState.value.name,
-                        address = websiteState.value.address,
-                        cipheredLogin = websiteState.value.cipheredLogin,
-                        cipheredPassword = websiteState.value.cipheredPassword,
-                        comment = websiteState.value.comment
-                    )
-                    val parseError = viewModel.parseWebsite(websiteEntity)
-                    if (parseError == Error.OKAY) {
-                        viewModel.addWebsite(websiteEntity)
-                        onBackIconClick()
-                    } else {
-                        when(parseError) {
-                            Error.NAME -> errorStateName.value = true
-                            Error.ADDRESS -> errorStateAddress.value = true
-                            Error.LOGIN -> errorStateLogin.value = true
-                            Error.PASSWORD -> errorStatePassword.value = true
-                            else -> {}
-                        }
-                    }
-                },
-                onDeleteClick = {},
-                screenState = screenState
-            )
-        }
+                }
+            },
+            onDeleteClick = {},
+            screenState = screenState
+        )
+    }
 }
 
 @Composable
